@@ -22,7 +22,11 @@ export function edgePath(e: Edge, style: LineStyle): string {
   const mx = e.fromRoot ? x1 + (x2 - x1) * 0.45 : (x1 + x2) / 2;
   if (style === "curve") {
     if (e.fromRoot) return `M${f(x1)},${f(y1)} C${f(x1 + (x2 - x1) * 0.25)},${f(y1)} ${f(mx)},${f(y2)} ${f(x2)},${f(y2)}`;
-    return `M${f(x1)},${f(y1)} C${f(mx)},${f(y1)} ${f(mx)},${f(y2)} ${f(x2)},${f(y2)}`;
+    // 两端水平进出;控制点放在 1/5 和 4/5 处,中段坡度约为对称 S 形的 0.6 倍,
+    // 子节点上下跨度大、水平间距小时不会变成「竖直的墙 + 两头小钩」
+    const c1 = x1 + (x2 - x1) * 0.2;
+    const c2 = x1 + (x2 - x1) * 0.8;
+    return `M${f(x1)},${f(y1)} C${f(c1)},${f(y1)} ${f(c2)},${f(y2)} ${f(x2)},${f(y2)}`;
   }
   return elbow(x1, y1, x2, y2, false, mx);
 }

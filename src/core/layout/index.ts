@@ -8,8 +8,8 @@ export * from "./types";
 
 export const SPACING = {
   /** 中心主题到一级分支的水平距离 */
-  rootGapX: 56,
-  gapX: 32,
+  rootGapX: 80,
+  gapX: 48,
   rootGapY: 18,
   gapY: 10,
   orgGapY: 40,

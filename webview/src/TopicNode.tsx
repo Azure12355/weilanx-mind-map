@@ -143,7 +143,7 @@ export const TopicNode = memo(function TopicNode({ box, style: s, m, content, se
       {s.shape === "underline" ? (
         <>
           <rect x={0} y={0} width={w} height={h} fill={fill} />
-          {hasBorder && <line x1={0} y1={h - s.borderWidth / 2} x2={w} y2={h - s.borderWidth / 2} stroke={s.border} strokeWidth={s.borderWidth} strokeLinecap="round" />}
+          {hasBorder && <line x1={0} y1={h} x2={w} y2={h} stroke={s.border} strokeWidth={s.borderWidth} strokeLinecap="round" />}
         </>
       ) : s.shape === "none" ? (
         <rect x={0} y={0} width={w} height={h} fill={fill} />
