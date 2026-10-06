@@ -1,0 +1,150 @@
+{
+  "version": 1,
+  "root": {
+    "id": "root01",
+    "text": "产品发布计划",
+    "note": "Q4 新版本发布的整体规划,负责人:蔚蓝",
+    "children": [
+      {
+        "id": "res001",
+        "text": "用户调研",
+        "markers": [
+          "priority-1",
+          "task-100"
+        ],
+        "summaries": [
+          {
+            "id": "sum001",
+            "from": "res002",
+            "to": "res004",
+            "text": "两周内完成"
+          }
+        ],
+        "children": [
+          {
+            "id": "res002",
+            "text": "深度访谈 10 人",
+            "labels": [
+              "定性"
+            ]
+          },
+          {
+            "id": "res003",
+            "text": "问卷 500 份",
+            "labels": [
+              "定量"
+            ]
+          },
+          {
+            "id": "res004",
+            "text": "竞品分析",
+            "link": "https://www.xmind.app"
+          }
+        ]
+      },
+      {
+        "id": "mvp001",
+        "text": "MVP 开发",
+        "markers": [
+          "priority-2",
+          "task-50"
+        ],
+        "boundaries": [
+          {
+            "id": "bnd001",
+            "from": "mvp002",
+            "to": "mvp003",
+            "text": "本迭代"
+          }
+        ],
+        "children": [
+          {
+            "id": "mvp002",
+            "text": "核心编辑器"
+          },
+          {
+            "id": "mvp003",
+            "text": "JSON 存储格式",
+            "markers": [
+              "star-yellow"
+            ]
+          },
+          {
+            "id": "mvp004",
+            "text": "Agent 支持",
+            "children": [
+              {
+                "id": "mvp005",
+                "text": "wm.mjs 命令行"
+              },
+              {
+                "id": "mvp006",
+                "text": "SKILL.md"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "qa0001",
+        "text": "测试验收",
+        "markers": [
+          "priority-3"
+        ],
+        "children": [
+          {
+            "id": "qa0002",
+            "text": "单元测试"
+          },
+          {
+            "id": "qa0003",
+            "text": "无头浏览器冒烟测试"
+          }
+        ]
+      },
+      {
+        "id": "rel001",
+        "text": "发布推广",
+        "children": [
+          {
+            "id": "rel002",
+            "text": "插件市场上架",
+            "markers": [
+              "flag-red"
+            ]
+          },
+          {
+            "id": "rel003",
+            "text": "写一篇教程\n配演示视频",
+            "note": "教程先发博客,再同步到公众号"
+          },
+          {
+            "id": "rel004",
+            "text": "社群反馈收集"
+          }
+        ]
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "id": "link01",
+      "from": "res003",
+      "to": "mvp003",
+      "text": "输入需求"
+    }
+  ],
+  "floating": [
+    {
+      "id": "flt001",
+      "text": "风险:排期偏紧",
+      "position": {
+        "x": 260,
+        "y": 250
+      },
+      "style": {
+        "fill": "#FFE8A3"
+      }
+    }
+  ]
+}

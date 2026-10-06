@@ -1,0 +1,323 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://azure12355.github.io/weilanx-mind-map/wmind.schema.json",
+  "title": "Weilanx Mind Map (.wmind)",
+  "type": "object",
+  "required": [
+    "version",
+    "root"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "version": {
+      "const": 1
+    },
+    "theme": {
+      "enum": [
+        "classic",
+        "fresh",
+        "business",
+        "night",
+        "sketch",
+        "mono"
+      ]
+    },
+    "structure": {
+      "enum": [
+        "map",
+        "logic",
+        "org",
+        "tree"
+      ]
+    },
+    "root": {
+      "$ref": "#/definitions/topic"
+    },
+    "relationships": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "from",
+          "to"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "from": {
+            "type": "string"
+          },
+          "to": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "controls": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "x",
+                "y"
+              ],
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                }
+              }
+            },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "style": {
+            "$ref": "#/definitions/style"
+          }
+        }
+      }
+    },
+    "floating": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/topic"
+      }
+    }
+  },
+  "definitions": {
+    "topic": {
+      "type": "object",
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "6 位短 id,新节点可省略,插件会自动补全"
+        },
+        "text": {
+          "type": "string",
+          "description": "纯文本,\\n 换行"
+        },
+        "collapsed": {
+          "type": "boolean"
+        },
+        "structure": {
+          "enum": [
+            "logic",
+            "org",
+            "tree"
+          ],
+          "description": "只对这个分支生效的结构"
+        },
+        "position": {
+          "type": "object",
+          "required": [
+            "x",
+            "y"
+          ],
+          "properties": {
+            "x": {
+              "type": "number"
+            },
+            "y": {
+              "type": "number"
+            }
+          },
+          "description": "仅自由主题:左上角相对中心主题中心的坐标"
+        },
+        "style": {
+          "$ref": "#/definitions/style"
+        },
+        "markers": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "priority-1",
+              "priority-2",
+              "priority-3",
+              "priority-4",
+              "priority-5",
+              "priority-6",
+              "priority-7",
+              "priority-8",
+              "priority-9",
+              "task-0",
+              "task-25",
+              "task-50",
+              "task-75",
+              "task-100",
+              "flag-red",
+              "flag-orange",
+              "flag-yellow",
+              "flag-green",
+              "flag-blue",
+              "flag-purple",
+              "star-red",
+              "star-orange",
+              "star-yellow",
+              "star-green",
+              "star-blue",
+              "star-purple",
+              "smiley-happy",
+              "smiley-laugh",
+              "smiley-sad",
+              "smiley-angry",
+              "smiley-surprised",
+              "symbol-question",
+              "symbol-exclamation",
+              "symbol-check",
+              "symbol-cross",
+              "symbol-idea"
+            ]
+          },
+          "uniqueItems": true
+        },
+        "labels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "note": {
+          "type": "string",
+          "description": "Markdown 备注"
+        },
+        "link": {
+          "type": "string",
+          "description": "http(s) 链接或相对路径"
+        },
+        "summaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/range"
+          }
+        },
+        "boundaries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/range"
+          }
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/topic"
+          }
+        }
+      }
+    },
+    "range": {
+      "type": "object",
+      "required": [
+        "from",
+        "to"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string",
+          "description": "范围第一个子节点的 id"
+        },
+        "to": {
+          "type": "string",
+          "description": "范围最后一个子节点的 id"
+        },
+        "text": {
+          "type": "string"
+        },
+        "style": {
+          "$ref": "#/definitions/style"
+        }
+      }
+    },
+    "style": {
+      "type": "object",
+      "description": "只写与主题默认值不同的键 / Only keys that differ from the theme default",
+      "properties": {
+        "shape": {
+          "enum": [
+            "rect",
+            "rounded",
+            "capsule",
+            "ellipse",
+            "underline",
+            "none"
+          ]
+        },
+        "fill": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            {
+              "const": "none"
+            }
+          ],
+          "description": "#RRGGBB 或 none"
+        },
+        "border": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^#[0-9a-fA-F]{6}$"
+            },
+            {
+              "const": "none"
+            }
+          ]
+        },
+        "borderWidth": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 6
+        },
+        "textColor": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "fontSize": {
+          "type": "number",
+          "minimum": 10,
+          "maximum": 48
+        },
+        "bold": {
+          "type": "boolean"
+        },
+        "italic": {
+          "type": "boolean"
+        },
+        "strike": {
+          "type": "boolean"
+        },
+        "lineColor": {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6}$"
+        },
+        "lineWidth": {
+          "type": "number",
+          "minimum": 1,
+          "maximum": 8
+        },
+        "lineStyle": {
+          "enum": [
+            "curve",
+            "straight",
+            "elbow",
+            "dashed",
+            "solid"
+          ]
+        }
+      }
+    }
+  }
+}

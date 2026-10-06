@@ -146,17 +146,14 @@ vscode-mind-map/
 │   ├── markers.ts         标记定义
 │   ├── markdown.ts        Markdown 大纲 ⇄ 文档
 │   └── layout/
-│       ├── types.ts       LayoutInput（树 + 每节点尺寸）→ LayoutResult（坐标、连线路径、包围盒）
-│       ├── map.ts         左右平衡思维导图
-│       ├── logic.ts       向右逻辑图
-│       ├── org.ts         向下组织结构图
-│       ├── tree.ts        向右下树形图
-│       └── extras.ts      联系线、概括、外框几何
+│       ├── types.ts       NodeSize → LayoutResult（节点框、连线、概括括号、外框、包围盒）
+│       ├── index.ts       布局引擎：map / logic / org / tree 四种排法，子树在局部坐标排好后由父节点平移拼装，可按分支混用
+│       └── geometry.ts    连线、渐细曲线、概括括号、联系线的路径计算
 ├── src/vscode/
 │   ├── extension.ts       注册 editor、命令、快捷键转发
 │   └── editor.ts          CustomTextEditorProvider
 ├── webview/src/           React 19 + Vite
-│   ├── App.tsx  Canvas.tsx  Topic.tsx  Toolbar.tsx  FormatPanel.tsx  Outline.tsx
+│   ├── App.tsx  Canvas.tsx  TopicNode.tsx  Toolbar.tsx  FormatPanel.tsx  Outline.tsx  scene.ts
 │   ├── measure.ts         canvas measureText 量节点尺寸
 │   ├── history.ts         撤销 / 重做快照栈
 │   ├── keys.ts            快捷键
@@ -176,9 +173,9 @@ vscode-mind-map/
 
 ### 3.1 数据流
 
-1. `CustomTextEditorProvider` 绑定 `*.wmind`，文件即 TextDocument：保存、脏标记、git diff、"用文本编辑器打开"均为原生能力。
+1. `CustomTextEditorProvider` 绑定 `*.wmind`，文件即 TextDocument：保存、脏标记、git diff、"用文本编辑器打开"均为原生能力。`.wmind` 同时注册为 json 语言，文本模式下有 JSON Schema 补全与校验。
 2. 打开时扩展端把文档文本发给 webview，webview 调 `core/doc.parse` 得到文档。
-3. 用户编辑：webview 调 `core/ops` 得新文档 → 立即重绘 → `serialize` 后把全文发给扩展端 → 扩展端用 `WorkspaceEdit` 整体替换。扩展端记录 `lastSentText`。
+3. 用户编辑：webview 调 `core/ops` 得新文档 → 立即重绘 → `serialize` 后把全文发给扩展端 → 扩展端用 `WorkspaceEdit` 整体替换，并在 `wmind.autoSave`（默认开启）时立即保存，保证 Agent 读到的总是最新内容。连续编辑只写最新全文；扩展端记录最后收到 / 正在写入的全文，用来识别自己引起的文档变化。
 4. 外部修改（Agent、git checkout、文本编辑器）：`onDidChangeTextDocument` 收到的文本 ≠ `lastSentText` 时推送给 webview 重新 parse；保留选中节点（按 id）和视口。
 5. 撤销 / 重做：webview 内维护文档快照栈（上限 200 步）。外部修改作为一个新快照入栈，因此撤销会回到外部修改前的状态。扩展端注册 `wmind.undo` / `wmind.redo` 命令，`when: activeCustomEditorId == weilanx.mindMap` 时绑定 `⌘Z` / `⌘⇧Z` 并转发给 webview。
 
@@ -259,7 +256,7 @@ SVG 渲染；节点尺寸用 canvas `measureText` 计算（按主题字体、字
 
 ## 6. 导入导出
 
-- **Markdown 大纲**：中心主题 = `# 标题`；一级分支 = `## 标题`；更深层 = `-` 列表（2 空格缩进）；备注 = 节点下方 `>` 引用块；标签 = 行尾 `` `#标签` ``。导出再导入后结构、文字、备注、标签不丢；样式、标记、联系线、概括、外框、自由主题导出时舍弃并提示。
+- **Markdown 大纲**：中心主题 = `# 标题`；一级分支 = `## 标题`；更深层 = `-` 列表（2 空格缩进）；备注 = 节点下方 `>` 引用块；标签 = 行尾 `` `#标签` ``；链接 = `[文字](地址)`；`task-0` / `task-100` 标记 = `[ ]` / `[x]`。导出再导入后结构、文字、备注、标签、链接不丢；样式、标记、联系线、概括、外框、自由主题导出时舍弃并提示。
 - **PNG / SVG**：导出整张图（非视口），四周留白 40px，背景随主题；PNG 为 2 倍像素。
 - 导出文件默认保存在 `.wmind` 同目录同名，通过保存对话框确认。
 - 命令 `wmind.importMarkdown`：在资源管理器右键 `.md` 文件生成同名 `.wmind`。
@@ -286,6 +283,10 @@ wm rel      <file> <from> <to> [--text …]          # 添加联系线
 wm from-md  <md> -o <file>
 wm to-md    <file>
 wm validate <file>                                  # 退出码 0 表示无问题
+wm summary  <file> <ref>... [--text …]              # 概括 / 外框(同一父节点下的兄弟)
+wm boundary <file> <ref>... [--text …]
+wm doc      <file> [--theme …] [--structure …]
+wm new      <file> <中心主题>
 ```
 
 - 路径用 `/` 分隔的节点文本，从中心主题开始，如 `产品规划/用户调研`；文本含 `/` 时用 `\/` 转义；路径有歧义时报错并列出候选 id。
@@ -297,7 +298,7 @@ wm validate <file>                                  # 退出码 0 表示无问�
 
 ## 8. 测试
 
-- **core 单元测试（vitest）**：parse ↔ serialize 往返一致；键序与默认值省略；未知字段保留；所有容错分支；ops 不可变性与级联规则；四种布局的坐标快照（固定尺寸输入）；Markdown 往返。
+- **core 单元测试（node:test + tsx，与 base-table 一致）**：parse ↔ serialize 往返一致；键序与默认值省略；未知字段保留；所有容错分支；ops 不可变性与级联规则；四种布局的坐标快照（固定尺寸输入）；Markdown 往返。
 - **CLI 集成测试**：对 `examples/` 下文件执行 `wm` 各命令，比对输出文件。
 - **webview 冒烟测试**：用本地 playwright-cli 启动无头浏览器访问 Vite 预览页（不使用 Chrome），覆盖键盘建节点、编辑文字（含中文输入）、拖拽、改样式、撤销，并截图检查视觉。
 - 每个里程碑结束时手动在 VS Code 中安装 `.vsix` 验证一次，包括"Agent 在外部改文件，画布实时刷新"。

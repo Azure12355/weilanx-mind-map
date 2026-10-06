@@ -1,0 +1,29 @@
+{
+  "skill_name": "weilanx-mind-map",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我看看 产品发布计划.wmind 里 MVP 开发下面都有哪些事，哪些标了星或者高优先级？不要改文件。",
+      "expected_output": "列出 MVP 开发 的子节点:核心编辑器、JSON 存储格式(星标)、Agent 支持(含 wm.mjs 命令行、SKILL.md);指出 MVP 开发 本身是 priority-2;文件未修改。",
+      "files": ["inputs/产品发布计划.wmind"]
+    },
+    {
+      "id": 2,
+      "prompt": "在 产品发布计划.wmind 的「测试验收」下面加三个子项：性能测试、兼容性测试、回归测试，给性能测试标最高优先级和 0% 进度；再把「发布推广」整个分支折叠起来，主题换成清新。",
+      "expected_output": "测试验收 新增三个子节点且顺序正确;性能测试 markers 含 priority-1 与 task-0;发布推广 collapsed=true;theme=fresh;其余节点与 id 不变;wm validate 通过。",
+      "files": ["inputs/产品发布计划.wmind"]
+    },
+    {
+      "id": 3,
+      "prompt": "把下面这份周会纪要做成思维导图 weekly.wmind，按议题分支，行动项标成未完成任务：\n# 周会 10-06\n## 进度\n- 编辑器完成 80%\n- CLI 已可用\n## 风险\n- 排期偏紧\n  > 需要砍掉导入功能\n## 行动项\n- [ ] 周三前补测试\n- [ ] 周五发版",
+      "expected_output": "生成 weekly.wmind,中心主题「周会 10-06」,三个一级分支;排期偏紧 带备注;两个行动项带 task-0 标记;wm validate 通过。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "产品发布计划.wmind 里，把「竞品分析」挪到「MVP 开发」下面当第一个子节点，然后在「用户调研」和「发布推广」之间加一条联系线，文字写「验证卖点」，最后把用户调研下剩下的两个节点用外框框起来，标题「已完成」。",
+      "expected_output": "竞品分析 成为 MVP 开发 第一个子节点;原有概括 sum001 收缩为 res002~res003;新增联系线 res001→rel001 文字 验证卖点;用户调研 新增 boundary from res002 to res003 text 已完成;wm validate 通过。",
+      "files": ["inputs/产品发布计划.wmind"]
+    }
+  ]
+}

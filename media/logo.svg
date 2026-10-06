@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#1E3A8A"/>
+    </linearGradient>
+  </defs>
+  <rect width="256" height="256" rx="56" fill="url(#bg)"/>
+  <g fill="none" stroke-linecap="round" stroke-width="9">
+    <path d="M128 128 C160 128 160 72 192 72" stroke="#F0604D"/>
+    <path d="M128 128 C160 128 160 184 192 184" stroke="#F5A623"/>
+    <path d="M128 128 C96 128 96 72 64 72" stroke="#3DB47A"/>
+    <path d="M128 128 C96 128 96 184 64 184" stroke="#E3578F"/>
+  </g>
+  <rect x="180" y="58" width="48" height="28" rx="9" fill="#F0604D"/>
+  <rect x="180" y="170" width="48" height="28" rx="9" fill="#F5A623"/>
+  <rect x="28" y="58" width="48" height="28" rx="9" fill="#3DB47A"/>
+  <rect x="28" y="170" width="48" height="28" rx="9" fill="#E3578F"/>
+  <rect x="92" y="108" width="72" height="40" rx="12" fill="#FFFFFF"/>
+  <text x="128" y="136" text-anchor="middle" font-family="Menlo, monospace" font-size="22" font-weight="700" fill="#1E3A8A">{ }</text>
+</svg>
