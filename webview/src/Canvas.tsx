@@ -320,7 +320,11 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
     }
     // 组织结构图里曲线会在父节点处挤成一束,改用圆角折线
     const style = e.orient === "v" && ps.lineStyle === "curve" ? "elbow" : ps.lineStyle;
-    return <path key={e.to} d={edgePath(e, style)} fill="none" stroke={color} strokeWidth={ps.lineWidth} strokeLinecap="round" opacity={dim ? 0.3 : 1} />;
+    // 父节点有填充色块或是下划线样式时,起点缩进去被盖住,线从边缘自然散出
+    const pb = L.nodes.get(e.from);
+    const hides = ps.fill !== "none" || ps.shape === "underline";
+    const inset = e.orient === "h" && hides && pb ? Math.min(24, pb.w * 0.3) : 0;
+    return <path key={e.to} d={edgePath(e, style, inset)} fill="none" stroke={color} strokeWidth={ps.lineWidth} strokeLinecap="round" opacity={dim ? 0.3 : 1} />;
   });
 
   const boundaries = L.boundaries.map((g) => {

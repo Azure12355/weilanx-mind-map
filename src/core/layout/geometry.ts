@@ -4,8 +4,11 @@ import { Edge, Rect, SummaryGeo } from "./types";
 
 const f = (n: number) => Math.round(n * 10) / 10;
 
-/** 父 → 子连线 */
-export function edgePath(e: Edge, style: LineStyle): string {
+/**
+ * 父 → 子连线。inset:曲线起点往父节点内部缩进的距离(被父节点色块或下划线盖住),
+ * 让线从父节点边缘斜着散出,而不是从一个点水平挤出。
+ */
+export function edgePath(e: Edge, style: LineStyle, inset = 0): string {
   const { x1, y1, x2, y2 } = e;
   if (style === "straight") return `M${f(x1)},${f(y1)} L${f(x2)},${f(y2)}`;
   if (e.orient === "tree") {
@@ -22,11 +25,10 @@ export function edgePath(e: Edge, style: LineStyle): string {
   const mx = e.fromRoot ? x1 + (x2 - x1) * 0.45 : (x1 + x2) / 2;
   if (style === "curve") {
     if (e.fromRoot) return `M${f(x1)},${f(y1)} C${f(x1 + (x2 - x1) * 0.25)},${f(y1)} ${f(mx)},${f(y2)} ${f(x2)},${f(y2)}`;
-    // 两端水平进出;控制点放在 1/5 和 4/5 处,中段坡度约为对称 S 形的 0.6 倍,
-    // 子节点上下跨度大、水平间距小时不会变成「竖直的墙 + 两头小钩」
-    const c1 = x1 + (x2 - x1) * 0.2;
-    const c2 = x1 + (x2 - x1) * 0.8;
-    return `M${f(x1)},${f(y1)} C${f(c1)},${f(y1)} ${f(c2)},${f(y2)} ${f(x2)},${f(y2)}`;
+    // 二次曲线:斜着出、平着收进子节点的下划线,整条线只有一个平滑的弯,
+    // 上下跨度大时也不会出现「竖墙」或两头急转
+    const p = x1 - Math.sign(x2 - x1 || 1) * inset;
+    return `M${f(p)},${f(y1)} Q${f(p + (x2 - p) * 0.45)},${f(y2)} ${f(x2)},${f(y2)}`;
   }
   return elbow(x1, y1, x2, y2, false, mx);
 }
