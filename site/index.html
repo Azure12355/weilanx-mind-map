@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Weilanx Mind Map · XMind-style mind maps for VS Code and Obsidian</title>
+  <meta name="description" content="XMind-style mind maps inside VS Code and Obsidian. Every map is one plain JSON file that you, git and your AI agent can all read." />
+  <meta name="theme-color" content="#ffffff" />
+  <meta property="og:title" content="Weilanx Mind Map" />
+  <meta property="og:description" content="XMind-style mind maps for VS Code and Obsidian, stored as plain JSON." />
+  <meta property="og:image" content="assets/hero.png" />
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" />
+  <!-- 中文手写强调字:霞鹜文楷(按字符分片加载) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-webfont@1.7.0/style.css" />
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1" defer></script>
+  <link rel="stylesheet" href="styles.css?v=1" />
+</head>
+<body>
+  <!-- ============ 导航 ============ -->
+  <header class="nav" id="nav">
+    <div class="nav-inner">
+      <a class="brand" href="#top" aria-label="Weilanx Mind Map">
+        <img src="assets/logo.png" width="30" height="30" alt="" />
+        <span>Weilanx Mind Map</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#ai" data-i18n="nav.ai">AI workflow</a>
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#scenes" data-i18n="nav.scenes">Use cases</a>
+        <a href="#data" data-i18n="nav.data">File format</a>
+        <a href="#install" data-i18n="nav.install">Install</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="lang" type="button" id="lang-toggle" aria-label="Switch language"><i class="ph ph-translate"></i><span>中文</span></button>
+        <a class="icon-btn" href="https://github.com/Azure12355/weilanx-mind-map" aria-label="GitHub"><i class="ph ph-github-logo"></i></a>
+        <a class="btn btn-dark btn-sm" href="#install" data-i18n="cta.free">Get it free</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ============ Hero ============ -->
+    <section class="hero">
+      <div class="hero-deco hero-deco-left" aria-hidden="true">
+        <div class="sketch-card float-a">
+          <svg viewBox="0 0 200 120" width="200" height="120">
+            <rect x="74" y="50" width="52" height="20" rx="6" fill="#1F2D3D" />
+            <path d="M126 60 C146 60 146 26 166 26 M126 60 H166 M126 60 C146 60 146 94 166 94 M74 60 C54 60 54 30 34 30 M74 60 C54 60 54 90 34 90" fill="none" stroke="#F0604D" stroke-width="2" />
+            <rect x="166" y="17" width="28" height="16" rx="4" fill="#F0604D" /><rect x="166" y="52" width="28" height="16" rx="4" fill="#F5A623" /><rect x="166" y="86" width="28" height="16" rx="4" fill="#3DB47A" />
+            <rect x="6" y="22" width="28" height="16" rx="4" fill="#2F9BEA" /><rect x="6" y="82" width="28" height="16" rx="4" fill="#7C63F2" />
+          </svg>
+        </div>
+        <div class="cursor cursor-you float-b"><svg width="18" height="18" viewBox="0 0 18 18"><path d="M2 1 L16 8 L9 10 L6 17 Z" fill="currentColor" /></svg><span data-i18n="hero.you">You</span></div>
+        <div class="chip chip-note float-c"><i class="ph ph-note"></i><span data-i18n="hero.chipNote">Note: ship by Friday</span></div>
+      </div>
+      <div class="hero-deco hero-deco-right" aria-hidden="true">
+        <div class="chip chip-marker float-b"><span class="m-dot">1</span><span class="m-pie"></span><span data-i18n="hero.chipMarker">MVP scope</span></div>
+        <div class="code-card float-a"><span class="k">"text"</span>: <span class="s">"Agent support"</span>,<br /><span class="k">"markers"</span>: [<span class="s">"priority-1"</span>]</div>
+        <div class="cursor cursor-ai float-c"><svg width="18" height="18" viewBox="0 0 18 18"><path d="M2 1 L16 8 L9 10 L6 17 Z" fill="currentColor" /></svg><span data-i18n="hero.ai">Claude is editing</span></div>
+      </div>
+
+      <div class="hero-copy">
+        <a class="pill-badge" href="https://github.com/Azure12355/weilanx-mind-map/releases/latest">
+          <span class="pill-new" data-i18n="hero.new">New</span><span data-i18n="hero.badge">Now on Obsidian too</span><i class="ph ph-arrow-right"></i>
+        </a>
+        <h1 class="hero-title">
+          <span data-i18n-html="hero.l1">Think <em class="script">in maps</em></span><br />
+          <span data-i18n-html="hero.l2">Keep it <em class="script">plain JSON</em></span>
+        </h1>
+        <p class="hero-sub" data-i18n="hero.sub">XMind-style mind maps inside VS Code and Obsidian. Every map is one JSON file that you, git and your AI agent can all read and edit.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-red btn-lg" href="#install"><i class="ph-bold ph-download-simple"></i><span data-i18n="cta.free">Get it free</span></a>
+          <a class="btn btn-outline btn-lg" href="https://github.com/Azure12355/weilanx-mind-map"><i class="ph ph-github-logo"></i><span data-i18n="cta.github">Star on GitHub</span></a>
+        </div>
+        <p class="hero-note" data-i18n="hero.note">Free and open source · MIT · No account, no cloud</p>
+      </div>
+
+      <div class="hero-shot reveal">
+        <div class="window">
+          <div class="window-bar"><i></i><i></i><i></i><span>AI应用开发路线.wmind</span></div>
+          <img src="assets/hero.png" width="1440" height="900" alt="Weilanx Mind Map canvas with format panel" />
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 适配的工具 ============ -->
+    <section class="logos">
+      <p data-i18n="logos.title">Works where you already think</p>
+      <div class="logo-row">
+        <span><i class="ph-fill ph-code"></i>VS Code</span>
+        <span><i class="ph-fill ph-cursor"></i>Cursor</span>
+        <span><i class="ph-fill ph-wind"></i>Windsurf</span>
+        <span><i class="ph-fill ph-diamond"></i>Obsidian</span>
+        <span><i class="ph-fill ph-asterisk"></i>Claude Code</span>
+        <span><i class="ph-fill ph-terminal-window"></i>Codex</span>
+      </div>
+    </section>
+
+    <!-- ============ AI 工作流(紫色大卡) ============ -->
+    <section class="wrap" id="ai">
+      <div class="ai-card reveal">
+        <div class="ai-copy">
+          <h2 data-i18n-html="ai.title">Now in your <br />AI workflow</h2>
+          <p data-i18n="ai.sub">Your agent reads the map as an outline, adds branches by path and validates every edit. The canvas redraws the moment the file changes.</p>
+          <ul class="ai-points">
+            <li><i class="ph-bold ph-check"></i><span data-i18n="ai.p1">Ready-made skill for Claude Code and friends</span></li>
+            <li><i class="ph-bold ph-check"></i><span data-i18n="ai.p2">Zero-dependency CLI: wm.mjs</span></li>
+            <li><i class="ph-bold ph-check"></i><span data-i18n="ai.p3">Byte-identical output to the plugin</span></li>
+          </ul>
+          <a class="btn btn-white" href="#install-agent"><span data-i18n="ai.cta">Install the skill</span><i class="ph ph-arrow-right"></i></a>
+        </div>
+        <div class="ai-diagram" aria-hidden="true">
+          <svg class="ai-lines" viewBox="0 0 520 340" preserveAspectRatio="none">
+            <path d="M260 170 C 200 170 190 60 110 60" /><path d="M260 170 C 200 170 190 280 110 280" />
+            <path d="M260 170 C 320 170 330 60 410 60" /><path d="M260 170 C 320 170 330 280 410 280" />
+          </svg>
+          <div class="node node-tl">Claude Code</div>
+          <div class="node node-bl">Codex</div>
+          <div class="node node-tr">wm.mjs</div>
+          <div class="node node-br">SKILL.md</div>
+          <div class="node-center">
+            <img src="assets/logo.png" width="34" height="34" alt="" />
+            <span>Weilanx Mind Map</span>
+            <span class="toggle"><span></span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 功能卡片墙 ============ -->
+    <section class="wrap" id="features">
+      <div class="section-head reveal">
+        <h2 data-i18n="features.title">Tools that think with you</h2>
+        <p data-i18n="features.sub">The editing feel of XMind, the openness of a text file.</p>
+      </div>
+
+      <div class="card card-teal card-wide reveal">
+        <div class="card-copy">
+          <h3><i class="ph-fill ph-tree-structure"></i><span data-i18n="f1.t">Edit like XMind</span></h3>
+          <p data-i18n="f1.d">Enter for a sibling, Tab for a child, drag to re-parent. Markers, labels, notes, links, relationships, summaries and boundaries are all here.</p>
+          <ul class="card-tags">
+            <li data-i18n="f1.k1">Keyboard first</li><li data-i18n="f1.k2">Drag &amp; drop</li><li data-i18n="f1.k3">Undo / redo</li><li data-i18n="f1.k4">IME friendly</li>
+          </ul>
+        </div>
+        <div class="card-media"><img src="assets/elements.png" loading="lazy" alt="" /></div>
+      </div>
+
+      <div class="card card-purple card-wide card-flip reveal">
+        <div class="card-copy">
+          <h3><i class="ph-fill ph-palette"></i><span data-i18n="f2.t">Six themes, light and dark</span></h3>
+          <p data-i18n="f2.d">Classic, Fresh, Business, Night, Sketch and Mono. Each has a light and a dark version that follows your editor.</p>
+        </div>
+        <div class="card-media"><img src="assets/themes.png" loading="lazy" alt="" /></div>
+      </div>
+
+      <div class="card-pair">
+        <div class="card card-blue reveal">
+          <div class="card-copy">
+            <h3><i class="ph-fill ph-graph"></i><span data-i18n="f3.t">Four structures</span></h3>
+            <p data-i18n="f3.d">Mind map, logic chart, org chart and tree chart, for the whole map or a single branch.</p>
+          </div>
+          <div class="card-media"><img src="assets/structures.png" loading="lazy" alt="" /></div>
+        </div>
+        <div class="card card-orange reveal">
+          <div class="card-copy">
+            <h3><i class="ph-fill ph-list-bullets"></i><span data-i18n="f4.t">Outline view</span></h3>
+            <p data-i18n="f4.d">Write the whole map as an indented list. Same shortcuts, same file.</p>
+          </div>
+          <div class="card-media"><img src="assets/outline.png" loading="lazy" alt="" /></div>
+        </div>
+      </div>
+
+      <div class="card card-dark card-wide reveal">
+        <div class="card-copy">
+          <h3><i class="ph-fill ph-sparkle"></i><span data-i18n="f5.t">And so much more</span></h3>
+          <ul class="more-list">
+            <li><i class="ph ph-image"></i><span data-i18n="f5.a">Export PNG (2x), SVG and Markdown</span></li>
+            <li><i class="ph ph-markdown-logo"></i><span data-i18n="f5.b">Turn a Markdown outline into a map</span></li>
+            <li><i class="ph ph-moon-stars"></i><span data-i18n="f5.c">Follows VS Code and Obsidian dark mode</span></li>
+            <li><i class="ph ph-link"></i><span data-i18n="f5.d">[[note]] links in Obsidian</span></li>
+            <li><i class="ph ph-clipboard-text"></i><span data-i18n="f5.e">Paste Markdown or indented text as topics</span></li>
+            <li><i class="ph ph-arrows-out"></i><span data-i18n="f5.f">Pan, pinch and zoom, even on touch</span></li>
+          </ul>
+        </div>
+        <div class="card-media"><img src="assets/dark.png" loading="lazy" alt="" /></div>
+      </div>
+    </section>
+
+    <!-- ============ 场景标签页 ============ -->
+    <section class="wrap scenes" id="scenes">
+      <div class="section-head reveal">
+        <h2 data-i18n="scenes.title">For the way you think</h2>
+        <p data-i18n="scenes.sub">From a quick brainstorm to a plan your agent keeps up to date.</p>
+      </div>
+      <div class="scene-tabs" role="tablist">
+        <button class="scene-tab active" data-scene="brain" style="--c:#F0604D"><i class="ph-fill ph-lightbulb"></i><span data-i18n="sc.brain">Brainstorming</span></button>
+        <button class="scene-tab" data-scene="plan" style="--c:#2F9BEA"><i class="ph-fill ph-kanban"></i><span data-i18n="sc.plan">Planning</span></button>
+        <button class="scene-tab" data-scene="learn" style="--c:#3DB47A"><i class="ph-fill ph-book-open"></i><span data-i18n="sc.learn">Learning</span></button>
+        <button class="scene-tab" data-scene="agent" style="--c:#7C63F2"><i class="ph-fill ph-robot"></i><span data-i18n="sc.agent">With your agent</span></button>
+      </div>
+      <div class="scene-stage reveal">
+        <div class="scene-panel active" data-scene="brain">
+          <div class="scene-text"><h3 data-i18n="sc.brain.t">Get every idea down, fast</h3><p data-i18n="sc.brain.d">Type, press Enter, keep going. Rainbow branches keep twenty ideas readable, and summaries pull them together.</p></div>
+          <div class="scene-img"><img src="assets/hero.png" loading="lazy" alt="" /></div>
+        </div>
+        <div class="scene-panel" data-scene="plan">
+          <div class="scene-text"><h3 data-i18n="sc.plan.t">Plans with priorities and progress</h3><p data-i18n="sc.plan.d">Priority and task markers, boundaries for this sprint, and an org chart when you need the big picture.</p></div>
+          <div class="scene-img"><img src="assets/structures.png" loading="lazy" alt="" /></div>
+        </div>
+        <div class="scene-panel" data-scene="learn">
+          <div class="scene-text"><h3 data-i18n="sc.learn.t">Notes that become maps</h3><p data-i18n="sc.learn.d">Right-click a Markdown outline to turn it into a map, then switch to the outline view to keep writing.</p></div>
+          <div class="scene-img"><img src="assets/outline.png" loading="lazy" alt="" /></div>
+        </div>
+        <div class="scene-panel" data-scene="agent">
+          <div class="scene-text"><h3 data-i18n="sc.agent.t">Let your agent keep it current</h3><p data-i18n="sc.agent.d">"Add the three test tasks under QA and mark the first one urgent." The agent edits the file, and the canvas redraws while you watch.</p></div>
+          <div class="scene-img"><img src="assets/agent.png" loading="lazy" alt="" /></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 数据在你手里(便当格) ============ -->
+    <section class="wrap" id="data">
+      <div class="section-head reveal">
+        <h2 data-i18n="data.title">Your map, your file</h2>
+        <p data-i18n="data.sub">No database, no account, no lock-in. Just JSON on your disk.</p>
+      </div>
+      <div class="bento">
+        <div class="bento-item bento-code reveal">
+          <div class="bento-label"><i class="ph-fill ph-brackets-curly"></i><span data-i18n="data.json">Plain JSON, nested like your thoughts</span></div>
+<pre><code><span class="p">{</span>
+  <span class="k">"version"</span>: <span class="n">1</span>,
+  <span class="k">"theme"</span>: <span class="s">"fresh"</span>,
+  <span class="k">"root"</span>: <span class="p">{</span>
+    <span class="k">"id"</span>: <span class="s">"a1b2c3"</span>, <span class="k">"text"</span>: <span class="s">"Product plan"</span>,
+    <span class="k">"children"</span>: [
+      <span class="p">{</span> <span class="k">"text"</span>: <span class="s">"Research"</span>, <span class="k">"markers"</span>: [<span class="s">"priority-1"</span>] <span class="p">}</span>,
+      <span class="p">{</span> <span class="k">"text"</span>: <span class="s">"MVP"</span>, <span class="k">"style"</span>: <span class="p">{</span> <span class="k">"fill"</span>: <span class="s">"#FFE8A3"</span> <span class="p">}</span> <span class="p">}</span>
+    ]
+  <span class="p">}</span>
+<span class="p">}</span></code></pre>
+        </div>
+        <div class="bento-item reveal">
+          <i class="bento-icon ph-fill ph-git-diff" style="--c:#F0604D"></i>
+          <h4 data-i18n="data.git">Clean git diffs</h4>
+          <p data-i18n="data.git.d">Fixed key order and indentation. Only non-default values are written.</p>
+        </div>
+        <div class="bento-item reveal">
+          <i class="bento-icon ph-fill ph-hard-drives" style="--c:#2F9BEA"></i>
+          <h4 data-i18n="data.local">Local first</h4>
+          <p data-i18n="data.local.d">Your files never leave your machine. Sync them however you like.</p>
+        </div>
+        <div class="bento-item reveal">
+          <i class="bento-icon ph-fill ph-seal-check" style="--c:#3DB47A"></i>
+          <h4 data-i18n="data.schema">JSON Schema included</h4>
+          <p data-i18n="data.schema.d">Completion and validation when you open the raw JSON.</p>
+        </div>
+        <div class="bento-item bento-dark reveal">
+          <i class="bento-icon ph-fill ph-lock-open" style="--c:#FFD166"></i>
+          <h4 data-i18n="data.oss">MIT, ad-free, no tracking</h4>
+          <p data-i18n="data.oss.d">Read every line of the source on GitHub.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 数字条 ============ -->
+    <section class="wrap stats reveal">
+      <div class="stat"><b>6</b><span data-i18n="st.themes">built-in themes</span></div>
+      <div class="stat"><b>4</b><span data-i18n="st.structures">layout structures</span></div>
+      <div class="stat"><b>2</b><span data-i18n="st.hosts">hosts: VS Code &amp; Obsidian</span></div>
+      <div class="stat"><b>0</b><span data-i18n="st.deps">dependencies in the agent CLI</span></div>
+    </section>
+
+    <!-- ============ 安装 ============ -->
+    <section class="wrap" id="install">
+      <div class="section-head reveal">
+        <h2 data-i18n="install.title">Up and running in a minute</h2>
+        <p data-i18n="install.sub">Pick where you think. Or hand the job to your agent.</p>
+      </div>
+      <div class="install reveal">
+        <div class="install-tabs" role="tablist">
+          <button class="install-tab active" data-tab="vscode"><i class="ph ph-code"></i>VS Code</button>
+          <button class="install-tab" data-tab="obsidian"><i class="ph ph-diamond"></i>Obsidian</button>
+          <button class="install-tab" data-tab="agent" id="install-agent"><i class="ph ph-robot"></i><span data-i18n="install.agent">Agent skill</span></button>
+          <button class="install-tab" data-tab="prompt"><i class="ph ph-chat-circle-text"></i><span data-i18n="install.prompt">Ask your agent</span></button>
+        </div>
+        <div class="install-panel active" data-tab="vscode">
+          <p data-i18n="install.vscode">Installs into every VS Code based editor it finds (VS Code, Cursor, Windsurf, Insiders):</p>
+          <div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/Azure12355/weilanx-mind-map/main/scripts/install.sh | bash</pre><button class="copy" type="button"><i class="ph ph-copy"></i></button></div>
+          <p class="muted" data-i18n-html="install.vscode2">Or download <a href="https://github.com/Azure12355/weilanx-mind-map/releases/latest/download/weilanx-mind-map.vsix">weilanx-mind-map.vsix</a> and choose <b>Install from VSIX…</b> in the Extensions view.</p>
+        </div>
+        <div class="install-panel" data-tab="obsidian">
+          <p data-i18n="install.obsidian">Pass your vault path. The plugin is copied in and enabled:</p>
+          <div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/Azure12355/weilanx-mind-map/main/scripts/install.sh | bash -s -- --obsidian "/path/to/vault"</pre><button class="copy" type="button"><i class="ph ph-copy"></i></button></div>
+          <p class="muted" data-i18n-html="install.obsidian2">Or put <code>main.js</code>, <code>manifest.json</code> and <code>styles.css</code> from the <a href="https://github.com/Azure12355/weilanx-mind-map/releases/latest">latest release</a> into <code>.obsidian/plugins/weilanx-mind-map/</code>, or use BRAT with <code>Azure12355/weilanx-mind-map</code>.</p>
+        </div>
+        <div class="install-panel" data-tab="agent">
+          <p data-i18n="install.skill">Installs SKILL.md and wm.mjs into ~/.claude/skills (Node 18+):</p>
+          <div class="code"><pre>curl -fsSL https://raw.githubusercontent.com/Azure12355/weilanx-mind-map/main/scripts/install.sh | bash -s -- --skill</pre><button class="copy" type="button"><i class="ph ph-copy"></i></button></div>
+          <p class="muted" data-i18n="install.skill2">For another agent, append its skills folder after --skill.</p>
+        </div>
+        <div class="install-panel" data-tab="prompt">
+          <p data-i18n="install.promptHint">Paste this into Claude Code, Codex, Cursor or any agent with a terminal:</p>
+          <div class="code"><pre id="prompt-text" data-i18n="install.promptText">Install the Weilanx Mind Map plugin and its agent skill for me.
+Follow https://github.com/Azure12355/weilanx-mind-map/blob/main/docs/install-for-agents.md,
+verify the install, then tell me the result.</pre><button class="copy" type="button"><i class="ph ph-copy"></i></button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 结尾 CTA ============ -->
+    <section class="final reveal">
+      <div class="final-logo"><img src="assets/logo.png" width="72" height="72" alt="" /></div>
+      <h2 data-i18n-html="final.title">Visualize your ideas. <em class="script">Keep</em> them yours.</h2>
+      <p data-i18n="final.sub">Free, open source and ready in VS Code and Obsidian today.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-red btn-lg" href="#install"><i class="ph-bold ph-download-simple"></i><span data-i18n="cta.free">Get it free</span></a>
+        <a class="btn btn-outline btn-lg" href="https://github.com/Azure12355/weilanx-mind-map"><i class="ph ph-github-logo"></i><span data-i18n="cta.github">Star on GitHub</span></a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ 页脚 ============ -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a class="brand" href="#top"><img src="assets/logo.png" width="28" height="28" alt="" /><span>Weilanx Mind Map</span></a>
+        <p data-i18n="footer.tag">XMind-style mind maps, stored as plain JSON.</p>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer.product">Product</h5>
+        <a href="#features" data-i18n="nav.features">Features</a>
+        <a href="#scenes" data-i18n="nav.scenes">Use cases</a>
+        <a href="#data" data-i18n="nav.data">File format</a>
+        <a href="#install" data-i18n="nav.install">Install</a>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer.resources">Resources</h5>
+        <a href="https://github.com/Azure12355/weilanx-mind-map">GitHub</a>
+        <a href="https://github.com/Azure12355/weilanx-mind-map/releases" data-i18n="footer.releases">Releases</a>
+        <a href="https://github.com/Azure12355/weilanx-mind-map/blob/main/docs/install-for-agents.md" data-i18n="footer.agents">Install for agents</a>
+        <a href="https://github.com/Azure12355/weilanx-mind-map/blob/main/skills/weilanx-mind-map/references/format.md" data-i18n="footer.format">Format reference</a>
+      </div>
+      <div class="footer-col">
+        <h5 data-i18n="footer.more">More from Weilanx</h5>
+        <a href="https://azure12355.github.io/weilanx-base-table/">Weilanx Base Table</a>
+        <a href="https://github.com/Azure12355/weilanx-mind-map/issues" data-i18n="footer.feedback">Feedback</a>
+      </div>
+    </div>
+    <div class="footer-bottom"><span>© 2026 Azure12355 · MIT License</span><span data-i18n="footer.made">Made for people and their agents.</span></div>
+  </footer>
+
+  <script src="main.js?v=1"></script>
+</body>
+</html>

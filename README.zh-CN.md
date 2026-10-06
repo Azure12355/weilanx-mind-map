@@ -16,7 +16,7 @@
   </a>
 </h1>
 
-<p align="center"><a href="./README.md">English</a> | 中文 | <a href="#-让-ai-agent-帮你安装">For Agents</a> | <a href="#-快速开始">快速开始</a> | <a href="#-文件格式">文件格式</a> | <a href="#-给-agent-用">Agent 读写</a> | <a href="#-开发">开发</a> | <a href="https://github.com/Azure12355/weilanx-mind-map/issues">反馈</a><br></p>
+<p align="center"><a href="./README.md">English</a> | 中文 | <a href="https://azure12355.github.io/weilanx-mind-map/">官网</a> | <a href="#-让-ai-agent-帮你安装">For Agents</a> | <a href="#-快速开始">快速开始</a> | <a href="#-文件格式">文件格式</a> | <a href="#-给-agent-用">Agent 读写</a> | <a href="#-开发">开发</a> | <a href="https://github.com/Azure12355/weilanx-mind-map/issues">反馈</a><br></p>
 
 <div align="center">
 

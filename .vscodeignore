@@ -23,3 +23,5 @@ versions.json
 esbuild.obsidian.mjs
 tsconfig.obsidian.json
 scripts/**
+site/**
+.github/**
