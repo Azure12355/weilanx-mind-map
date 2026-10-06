@@ -1,0 +1,189 @@
+{
+  "version": 1,
+  "root": {
+    "id": "root",
+    "text": "AI 应用开发路线",
+    "note": "一年计划,每月复盘一次",
+    "children": [
+      {
+        "id": "base",
+        "text": "基础能力",
+        "markers": [
+          "priority-1",
+          "task-100"
+        ],
+        "summaries": [
+          {
+            "id": "bqqmuq",
+            "from": "b1",
+            "to": "b3",
+            "text": "一个月打牢"
+          }
+        ],
+        "children": [
+          {
+            "id": "b1",
+            "text": "Python 与 TypeScript",
+            "labels": [
+              "必修"
+            ]
+          },
+          {
+            "id": "b2",
+            "text": "HTTP 与异步编程"
+          },
+          {
+            "id": "b3",
+            "text": "Git 协作"
+          }
+        ]
+      },
+      {
+        "id": "api",
+        "text": "大模型 API",
+        "markers": [
+          "priority-2",
+          "task-75"
+        ],
+        "boundaries": [
+          {
+            "id": "gfc4bg",
+            "from": "m1",
+            "to": "m2",
+            "text": "本周重点"
+          }
+        ],
+        "children": [
+          {
+            "id": "m1",
+            "text": "Prompt 设计",
+            "markers": [
+              "star-yellow"
+            ]
+          },
+          {
+            "id": "m2",
+            "text": "工具调用"
+          },
+          {
+            "id": "m3",
+            "text": "流式输出"
+          },
+          {
+            "id": "m4",
+            "text": "上下文缓存",
+            "note": "长文档反复提问时能省一大半费用"
+          }
+        ]
+      },
+      {
+        "id": "agent",
+        "text": "Agent 开发",
+        "markers": [
+          "priority-1",
+          "task-25"
+        ],
+        "children": [
+          {
+            "id": "a1",
+            "text": "规划与反思"
+          },
+          {
+            "id": "a2",
+            "text": "记忆系统",
+            "labels": [
+              "进阶"
+            ]
+          },
+          {
+            "id": "a3",
+            "text": "多 Agent 协作",
+            "markers": [
+              "flag-red"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "eng",
+        "text": "工程化",
+        "markers": [
+          "task-50"
+        ],
+        "children": [
+          {
+            "id": "e1",
+            "text": "评测集",
+            "link": "https://github.com"
+          },
+          {
+            "id": "e2",
+            "text": "可观测性"
+          },
+          {
+            "id": "e3",
+            "text": "成本控制",
+            "markers": [
+              "symbol-idea"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "port",
+        "text": "作品集",
+        "markers": [
+          "priority-3"
+        ],
+        "children": [
+          {
+            "id": "p1",
+            "text": "思维导图插件",
+            "markers": [
+              "task-100"
+            ]
+          },
+          {
+            "id": "p2",
+            "text": "个人知识库助手"
+          },
+          {
+            "id": "p3",
+            "text": "开源一个 MCP Server"
+          }
+        ]
+      }
+    ]
+  },
+  "relationships": [
+    {
+      "id": "rel1",
+      "from": "m4",
+      "to": "a2",
+      "text": "复用",
+      "controls": [
+        {
+          "x": 150,
+          "y": 10
+        },
+        {
+          "x": 150,
+          "y": -10
+        }
+      ]
+    }
+  ],
+  "floating": [
+    {
+      "id": "fl1",
+      "text": "💡 每周写一篇复盘",
+      "position": {
+        "x": -560,
+        "y": 260
+      },
+      "style": {
+        "fill": "#FFE8A3"
+      }
+    }
+  ]
+}
