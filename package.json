@@ -1,0 +1,56 @@
+{
+  "name": "weilanx-mind-map",
+  "displayName": "%displayName%",
+  "description": "%description%",
+  "version": "0.1.0",
+  "publisher": "weilanx",
+  "icon": "media/logo.png",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Azure12355/weilanx-mind-map.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Visualization",
+    "Other"
+  ],
+  "keywords": [
+    "mind map",
+    "mindmap",
+    "xmind",
+    "思维导图",
+    "json",
+    "agent"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "contributes": {},
+  "scripts": {
+    "build:ext": "esbuild src/vscode/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "build:web": "vite build",
+    "build:cli": "esbuild src/cli/wm.ts --bundle --outfile=skills/weilanx-mind-map/scripts/wm.mjs --format=esm --platform=node --target=node18 --banner:js=\"#!/usr/bin/env node\"",
+    "build": "npm run build:web && npm run build:ext && npm run build:cli",
+    "dev:web": "vite",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p webview/tsconfig.json",
+    "test": "node --test --import tsx test/*.test.ts",
+    "package": "npm run build && npx --yes @vscode/vsce package --no-dependencies -o weilanx-mind-map.vsix"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vite": "^6.0.0"
+  },
+  "dependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
