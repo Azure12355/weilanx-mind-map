@@ -13,7 +13,7 @@
 - 独立新项目，首期只做 VS Code；`core` 层与平台解耦，以后可扩展 Obsidian。
 - 工程结构、技术栈、发布方式沿用兄弟项目 `vscode-base-table`（Weilanx Base Table）。
 
-项目位置：`/Users/lytton/Creator/00-CODEBASE/vscode-mind-map`，插件名 `weilanx-mind-map`，publisher `weilanx`。
+仓库：`Azure12355/weilanx-mind-map`，插件名 `weilanx-mind-map`，publisher `weilanx`。
 
 ### 不做（YAGNI）
 
