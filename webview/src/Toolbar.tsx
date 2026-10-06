@@ -63,6 +63,7 @@ export function Toolbar({ actions: a, view, setView, panel, togglePanel }: { act
         <Btn icon={<Icon.relationship />} label={t("relationship")} onClick={a.startLinking} disabled={ro || !one || view !== "map"} />
         <Btn icon={<Icon.summary />} label={t("summary")} onClick={() => a.addRange("summaries")} disabled={ro || !topics.length || view !== "map"} />
         <Btn icon={<Icon.boundary />} label={t("boundary")} onClick={() => a.addRange("boundaries")} disabled={ro || !topics.length || view !== "map"} />
+        <Btn icon={<Icon.trash />} onClick={a.remove} disabled={ro || !a.selection.length || (a.selection.length === 1 && a.selection[0] === a.doc.root.id) || view !== "map"} title={`${t("remove")} (Delete)`} />
       </div>
       <div className="wm-tb-spacer" />
       <div className="wm-tb-group">

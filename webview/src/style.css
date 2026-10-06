@@ -1,5 +1,6 @@
-/* 界面外框跟随 VS Code 主题变量;浏览器预览时用后备值 */
-:root {
+/* 界面外框跟随宿主主题变量(VS Code 的 --vscode-*;Obsidian 版由 src/obsidian/theme.css 映射过来),浏览器预览时用后备值。
+   所有规则都在 .wm-root 之下:Obsidian 版打包时整体包进 `body .wm-root { … }`,不影响 Obsidian 其他界面。 */
+.wm-root {
   --wm-bg: var(--vscode-editor-background, #ffffff);
   --wm-fg: var(--vscode-foreground, #24292f);
   --wm-muted: var(--vscode-descriptionForeground, #6e7781);
@@ -15,34 +16,18 @@
   --wm-pop: var(--vscode-editorWidget-background, #ffffff);
   --wm-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
   --wm-font: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif);
-}
-body:not([class*="vscode"]) .wm-dark,
-body:not([class*="vscode"]) .wm-dark * {
-  --wm-bg: #1e1f22;
-  --wm-fg: #e3e5e8;
-  --wm-muted: #9aa0a6;
-  --wm-bar: #25262a;
-  --wm-input-bg: #2b2d31;
-  --wm-pop: #2b2d31;
-}
-* {
-  box-sizing: border-box;
-}
-html,
-body,
-#root {
-  margin: 0;
-  padding: 0;
   height: 100%;
-  overflow: hidden;
-}
-body {
   font-family: var(--wm-font);
   font-size: 13px;
   color: var(--wm-fg);
   background: var(--wm-bg);
 }
-button {
+.wm-root *,
+.wm-root *::before,
+.wm-root *::after {
+  box-sizing: border-box;
+}
+.wm-root button {
   font: inherit;
   color: inherit;
 }
@@ -50,8 +35,7 @@ button {
   display: flex;
   flex-direction: column;
   height: 100%;
-  color: var(--wm-fg);
-  background: var(--wm-bg);
+  overflow: hidden;
 }
 .wm-loading {
   height: 100%;

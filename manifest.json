@@ -1,0 +1,10 @@
+{
+  "id": "weilanx-mind-map",
+  "name": "Weilanx Mind Map",
+  "version": "0.2.0",
+  "minAppVersion": "1.5.0",
+  "description": "XMind-style mind maps stored as plain JSON (.wmind): themes, structures, markers, notes, relationships, summaries and boundaries. Friendly to AI agents.",
+  "author": "Azure12355",
+  "authorUrl": "https://github.com/Azure12355",
+  "isDesktopOnly": false
+}

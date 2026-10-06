@@ -95,6 +95,48 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
     return () => el.removeEventListener("wheel", onWheel);
   }, [setViewport]);
 
+  // 触屏双指缩放:记录所有按下的触点,两指时取消当前拖动,按两指距离变化缩放
+  const touches = useRef(new Map<number, Point>());
+  const pinch = useRef<{ d0: number; v0: Viewport; mid: Point } | null>(null);
+  useEffect(() => {
+    const el = wrapRef.current!;
+    const down = (e: PointerEvent) => {
+      if (e.pointerType !== "touch") return;
+      touches.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (touches.current.size === 2) {
+        const [a, b] = [...touches.current.values()];
+        const rect = el.getBoundingClientRect();
+        pinch.current = { d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, v0: vpRef.current, mid: { x: (a.x + b.x) / 2 - rect.left, y: (a.y + b.y) / 2 - rect.top } };
+        setD(null);
+      }
+    };
+    const move = (e: PointerEvent) => {
+      if (!touches.current.has(e.pointerId)) return;
+      touches.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const p = pinch.current;
+      if (!p || touches.current.size < 2) return;
+      const [a, b] = [...touches.current.values()];
+      const rect = el.getBoundingClientRect();
+      const mid = { x: (a.x + b.x) / 2 - rect.left, y: (a.y + b.y) / 2 - rect.top };
+      const z = zoomAt(p.v0, Math.hypot(a.x - b.x, a.y - b.y) / p.d0, p.mid.x, p.mid.y);
+      setViewport({ ...z, x: z.x + mid.x - p.mid.x, y: z.y + mid.y - p.mid.y });
+    };
+    const up = (e: PointerEvent) => {
+      touches.current.delete(e.pointerId);
+      if (touches.current.size < 2) pinch.current = null;
+    };
+    el.addEventListener("pointerdown", down, true);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    return () => {
+      el.removeEventListener("pointerdown", down, true);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+  }, [setViewport]);
+
   const toWorld = (cx: number, cy: number): Point => {
     const rect = wrapRef.current!.getBoundingClientRect();
     const v = vpRef.current;
@@ -145,7 +187,7 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
     if (!drag) return;
     const onMove = (e: PointerEvent) => {
       const d = dragRef.current;
-      if (!d) return;
+      if (!d || pinch.current) return;
       if (d.mode === "pan") {
         const dx = e.clientX - d.sx;
         const dy = e.clientY - d.sy;
@@ -204,6 +246,7 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
 
   const onPointerDown = (e: React.PointerEvent) => {
     if (e.button !== 0 && e.button !== 1) return;
+    if (pinch.current) return;
     const target = (e.target as Element).closest("[data-kind]") as HTMLElement | null;
     const kind = target?.dataset.kind;
     const id = target?.dataset.id ?? target?.closest("[data-id]")?.getAttribute("data-id") ?? "";

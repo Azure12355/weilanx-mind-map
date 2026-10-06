@@ -5,3 +5,4 @@ out/
 .playwright-cli/
 .claude/
 skills/*-workspace/
+dist/

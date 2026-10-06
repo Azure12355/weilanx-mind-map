@@ -6,7 +6,7 @@
 
 <p align="center">English | <a href="./README.zh-CN.md">中文</a></p>
 
-An XMind-style mind map editor for VS Code. Each map is a `.wmind` file containing plain JSON. You edit on a canvas, AI agents read and write the file directly, and changes on either side show up live.
+An XMind-style mind map editor for VS Code and Obsidian. Each map is a `.wmind` file containing plain JSON. You edit on a canvas, AI agents read and write the file directly, and changes on either side show up live.
 
 ![Mind map](./media/readme/map.png)
 
@@ -29,6 +29,10 @@ An XMind-style mind map editor for VS Code. Each map is a `.wmind` file containi
 1. Install `weilanx-mind-map.vsix` (Command Palette → `Extensions: Install from VSIX...`).
 2. Right-click a folder → **Create Mind Map (.wmind)**, or open any `.wmind` file.
 3. Use **Open as JSON Text** in the editor title bar to view or edit the raw JSON. Text mode has JSON Schema completion and validation.
+
+### Obsidian
+
+Run `npm run build:obsidian`, copy `main.js`, `manifest.json` and `styles.css` from `dist/obsidian/` into `<vault>/.obsidian/plugins/weilanx-mind-map/`, then enable **Weilanx Mind Map** under Settings → Community plugins. Create maps from the ribbon icon, the command palette or a folder's context menu; right-click a Markdown note to convert it. It uses the same canvas and the same `.wmind` files as the VS Code version. Links may be `[[note]]`, and the canvas follows Obsidian's light/dark theme and accent color.
 
 | Action | Keys |
 |---|---|
@@ -83,6 +87,7 @@ npm install
 npm run dev:web     # preview the canvas in a browser
 npm test            # core unit tests + CLI integration tests
 npm run package     # build weilanx-mind-map.vsix
+npm run build:obsidian   # build the Obsidian plugin into dist/obsidian/
 ```
 
 ## License

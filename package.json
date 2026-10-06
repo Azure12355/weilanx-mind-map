@@ -2,7 +2,7 @@
   "name": "weilanx-mind-map",
   "displayName": "%displayName%",
   "description": "%description%",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "publisher": "weilanx",
   "icon": "media/logo.png",
   "license": "MIT",
@@ -242,9 +242,12 @@
     "build:cli": "esbuild src/cli/wm.ts --bundle --outfile=skills/weilanx-mind-map/scripts/wm.mjs --format=esm --platform=node --target=node18 --banner:js=\"#!/usr/bin/env node\"",
     "build": "npm run build:web && npm run build:ext && npm run build:cli",
     "dev:web": "vite",
-    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p webview/tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p webview/tsconfig.json && tsc --noEmit -p tsconfig.obsidian.json",
     "test": "npm run build:cli && node --test --import tsx test/*.test.ts",
-    "package": "npm run build && npx --yes @vscode/vsce package --no-dependencies -o weilanx-mind-map.vsix"
+    "package": "npm run build && npx --yes @vscode/vsce package --no-dependencies -o weilanx-mind-map.vsix",
+    "build:obsidian": "node esbuild.obsidian.mjs",
+    "dev:obsidian": "node esbuild.obsidian.mjs --watch",
+    "release": "npm run package && npm run build:obsidian"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -253,6 +256,7 @@
     "@types/vscode": "^1.90.0",
     "@vitejs/plugin-react": "^4.3.4",
     "esbuild": "^0.24.0",
+    "obsidian": "^1.13.1",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3",
     "vite": "^6.0.0"

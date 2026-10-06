@@ -1,0 +1,18 @@
+/* 只用于 VS Code webview 与浏览器预览的整页样式(Obsidian 版不打包这个文件) */
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+/* 浏览器预览(没有 VS Code 主题变量)时的暗色后备值 */
+body:not([class*="vscode"]) .wm-dark {
+  --wm-bg: #1e1f22;
+  --wm-fg: #e3e5e8;
+  --wm-muted: #9aa0a6;
+  --wm-bar: #25262a;
+  --wm-input-bg: #2b2d31;
+  --wm-pop: #2b2d31;
+}

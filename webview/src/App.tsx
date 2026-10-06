@@ -6,7 +6,7 @@ import { getTopic, indexDoc } from "../../src/core/query";
 import { markdownLosses, textToTopics, toMarkdown } from "../../src/core/markdown";
 import { relationshipGeom } from "../../src/core/layout/geometry";
 import type { Issue, MindDoc, Point, Topic } from "../../src/core/types";
-import { getHost, type HostCommand, type InMsg } from "./host";
+import type { Host, HostCommand, HostKind, InMsg } from "./host";
 import { History } from "./history";
 import { buildScene } from "./scene";
 import { Canvas, zoomAt, type CanvasApi, type DropTarget, type Viewport } from "./Canvas";
@@ -48,6 +48,9 @@ export interface Actions {
 
 function detectDark(): boolean {
   const c = document.body.classList;
+  // Obsidian
+  if (c.contains("theme-dark")) return true;
+  if (c.contains("theme-light")) return false;
   if (c.contains("vscode-light") || c.contains("vscode-high-contrast-light")) return false;
   if (c.contains("vscode-dark") || c.contains("vscode-high-contrast")) return true;
   const q = new URLSearchParams(location.search).get("dark");
@@ -57,15 +60,16 @@ function detectDark(): boolean {
 
 const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
 
-export function App() {
-  const host = getHost();
+export function App({ host }: { host: Host }) {
+  /** 整个界面的根元素:Obsidian 里多个导图共用一个页面,全局事件只处理落在本界面内的 */
+  const rootRef = useRef<HTMLDivElement>(null);
   const [doc, setDocState] = useState<MindDoc | null>(null);
   const docRef = useRef<MindDoc | null>(null);
   const [error, setError] = useState<ParseError | null>(null);
   const [issues, setIssues] = useState<Issue[]>([]);
   const [showIssues, setShowIssues] = useState(false);
   const [readOnly, setReadOnly] = useState(false);
-  const [inVsCode, setInVsCode] = useState(false);
+  const [hostKind, setHostKind] = useState<HostKind>("preview");
   const fileName = useRef("mindmap");
   const history = useRef(new History());
   const [, bump] = useReducer((x: number) => x + 1, 0);
@@ -394,7 +398,7 @@ export function App() {
     }
     if (view !== "map") setView("map");
     await new Promise((r) => requestAnimationFrame(() => r(null)));
-    const world = document.querySelector(".wm-world") as SVGGElement | null;
+    const world = rootRef.current?.querySelector(".wm-world") as SVGGElement | null;
     if (!world) return;
     const { svg, w, h } = buildSvg(world, s.palette.background);
     if (format === "svg") host.post({ type: "export", format, data: svg, encoding: "utf8", defaultName: `${name}.svg` });
@@ -411,7 +415,8 @@ export function App() {
   useEffect(() => {
     const inField = (e: Event) => {
       const el = e.target as HTMLElement | null;
-      return !!el && el !== captureRef.current && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
+      if (!el || !rootRef.current?.contains(el)) return true; // 不是本界面的事件,不处理
+      return el !== captureRef.current && (el.tagName === "INPUT" || el.tagName === "TEXTAREA" || el.isContentEditable);
     };
     const onCopy = (e: ClipboardEvent, cut: boolean) => {
       const d = docRef.current;
@@ -471,7 +476,7 @@ export function App() {
     const off = host.subscribe((m: InMsg) => {
       if (m.type === "init") {
         setLang(m.lang);
-        setInVsCode(m.inVsCode);
+        setHostKind(m.host);
         fileName.current = m.fileName;
         loadRef.current(m.text, true);
       } else if (m.type === "update") loadRef.current(m.text, false);
@@ -492,6 +497,7 @@ export function App() {
     const onKey = (e: KeyboardEvent) => {
       if (editingRef.current || view !== "map") return;
       const tgt = e.target as HTMLElement;
+      if (!rootRef.current?.contains(tgt)) return;
       if (tgt !== captureRef.current && (tgt.tagName === "INPUT" || tgt.tagName === "TEXTAREA" || tgt.tagName === "SELECT" || tgt.isContentEditable)) return;
       if (e.isComposing || e.key === "Process") return;
       const mod = isMac ? e.metaKey : e.ctrlKey;
@@ -503,7 +509,7 @@ export function App() {
         e.stopPropagation();
       };
       // VS Code 里撤销 / 缩放由宿主命令转发;浏览器预览里自己处理
-      if (mod && !inVsCode) {
+      if (mod && hostKind === "preview") {
         const k = key.toLowerCase();
         if (k === "z" && !e.shiftKey) return handled(), undo();
         if ((k === "z" && e.shiftKey) || k === "y") return handled(), redo();
@@ -566,6 +572,7 @@ export function App() {
     };
     const onKeyUp = (e: KeyboardEvent) => {
       if (e.key !== " " || !spaceHeld.current.down) return;
+      if (!rootRef.current?.contains(e.target as Node)) return;
       const used = spaceHeld.current.used;
       spaceHeld.current = { down: false, used: false };
       if (!used && !editingRef.current && selRef.current.length === 1) startEdit(selRef.current[0]);
@@ -665,7 +672,7 @@ export function App() {
 
   if (error) {
     return (
-      <div className="wm-error">
+      <div className="wm-root wm-error" ref={rootRef}>
         <div className="wm-error-card">
           <div className="wm-error-icon">
             <Icon.warn />
@@ -674,14 +681,16 @@ export function App() {
           <p className="wm-error-pos">{t("parseErrorAt", error.line, error.column)}</p>
           <pre>{error.message}</pre>
           <p>{t("parseErrorHint")}</p>
-          <button className="wm-btn wm-btn-primary" onClick={() => host.post({ type: "openText" })}>
-            {t("openAsText")}
-          </button>
+          {hostKind === "vscode" && (
+            <button className="wm-btn wm-btn-primary" onClick={() => host.post({ type: "openText" })}>
+              {t("openAsText")}
+            </button>
+          )}
         </div>
       </div>
     );
   }
-  if (!doc || !scene || !actions) return <div className="wm-loading" />;
+  if (!doc || !scene || !actions) return <div className="wm-root wm-loading" ref={rootRef} />;
 
   // 文字输入框:编辑时显示在节点上;不编辑时透明地停在选中节点上,接收快捷键和输入法输入
   const v = viewport;
@@ -734,7 +743,7 @@ export function App() {
   }
 
   return (
-    <div className={"wm-app" + (dark ? " wm-dark" : "")}>
+    <div className={"wm-root wm-app" + (dark ? " wm-dark" : "")} ref={rootRef}>
       <Toolbar actions={actions} view={view} setView={setView} panel={panel} togglePanel={() => setPanel((p) => (localStorage.setItem("wmind-panel", p ? "0" : "1"), !p))} />
       <div className="wm-main">
         <div className="wm-stage">

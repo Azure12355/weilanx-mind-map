@@ -6,7 +6,7 @@
 
 <p align="center"><a href="./README.md">English</a> | 中文</p>
 
-在 VS Code 里使用的 XMind 风格思维导图。每张导图是一个 `.wmind` 文件，内容就是普通 JSON：人在画布上编辑，AI Agent 直接读写文件，两边的改动会实时同步。
+在 VS Code 和 Obsidian 里使用的 XMind 风格思维导图。每张导图是一个 `.wmind` 文件，内容就是普通 JSON：人在画布上编辑，AI Agent 直接读写文件，两边的改动会实时同步。
 
 ![思维导图](./media/readme/map.png)
 
@@ -29,6 +29,18 @@
 1. 安装 `weilanx-mind-map.vsix`：VS Code 命令面板 → `Extensions: Install from VSIX...`。
 2. 在资源管理器里右键文件夹 → **创建思维导图 (.wmind)**；也可以直接打开任意 `.wmind` 文件。
 3. 想看或手改 JSON 时，点编辑器右上角的 **以 JSON 文本打开**（文本模式下自带 JSON Schema 补全和校验）。
+
+### Obsidian
+
+1. 运行 `npm run build:obsidian`，把 `dist/obsidian/` 下的 `main.js`、`manifest.json`、`styles.css` 复制到 `<你的库>/.obsidian/plugins/weilanx-mind-map/`。
+2. 在 Obsidian 的 设置 → 第三方插件 里启用 **Weilanx Mind Map**。
+3. 左侧功能区的脑图图标、命令面板里的「创建思维导图」，或者文件列表里右键文件夹，都可以新建导图；右键 Markdown 笔记可以把它转换为导图。
+
+和 VS Code 版用的是同一套画布和同一种 `.wmind` 文件，两边可以打开同一个文件。Obsidian 版额外支持：
+
+- 链接可以写成 `[[笔记名]]`，点击后在 Obsidian 里打开对应笔记。
+- 跟随 Obsidian 的亮色 / 暗色主题和强调色。
+- 导出的 PNG / SVG / Markdown 保存在导图所在目录。
 
 ### 快捷键
 
@@ -110,9 +122,11 @@ npm run dev:web     # 浏览器里预览画布（用 localStorage 模拟文件�
 npm test            # core 单元测试 + wm.mjs 集成测试
 npm run typecheck
 npm run package     # 构建并打包 weilanx-mind-map.vsix
+npm run build:obsidian   # 构建 Obsidian 插件到 dist/obsidian/
+npm run dev:obsidian -- --out <库>/.obsidian/plugins/weilanx-mind-map   # 边改边构建到测试库
 ```
 
-目录结构：`src/core`（格式、编辑操作、主题、布局，纯 TS）· `src/vscode`（自定义编辑器）· `webview`（React 画布）· `src/cli`（`wm.mjs`）。
+目录结构：`src/core`（格式、编辑操作、主题、布局，纯 TS）· `src/vscode`（VS Code 自定义编辑器）· `src/obsidian`（Obsidian 视图）· `webview`（两端共用的 React 画布）· `src/cli`（`wm.mjs`）。
 
 ## 许可
 

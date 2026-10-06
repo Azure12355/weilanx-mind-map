@@ -99,7 +99,7 @@ export class MindMapController {
           text: this.lastText,
           lang: vscode.env.language,
           fileName: path.basename(this.document.uri.fsPath, ".wmind"),
-          inVsCode: true,
+          host: "vscode",
         });
         break;
       case "edit":

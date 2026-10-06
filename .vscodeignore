@@ -17,3 +17,8 @@ media/readme/**
 media/logo.svg
 README.zh-CN.md
 skills/**
+dist/**
+manifest.json
+versions.json
+esbuild.obsidian.mjs
+tsconfig.obsidian.json

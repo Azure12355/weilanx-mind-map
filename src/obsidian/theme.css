@@ -1,0 +1,37 @@
+/* Weilanx Mind Map · Obsidian 适配层
+   1. 把画布界面使用的 --vscode-* 变量映射到 Obsidian 主题变量,亮暗主题和第三方主题自动跟随
+   2. 还原 Obsidian 对 button / input / select / textarea 的全局样式,让界面与 VS Code 版一致
+   共享界面样式在打包时整体包进 `body .wm-root { ... }`,不会影响 Obsidian 其他界面。 */
+
+.wm-obsidian {
+  --vscode-editor-background: var(--background-primary);
+  --vscode-foreground: var(--text-normal);
+  --vscode-descriptionForeground: var(--text-muted);
+  --vscode-focusBorder: var(--interactive-accent);
+  --vscode-panel-border: var(--background-modifier-border);
+  --vscode-widget-border: var(--background-modifier-border);
+  --vscode-sideBar-background: var(--background-secondary);
+  --vscode-toolbar-hoverBackground: var(--background-modifier-hover);
+  --vscode-toolbar-activeBackground: var(--background-modifier-active-hover);
+  --vscode-editorWidget-background: var(--background-primary);
+  --vscode-input-background: var(--background-modifier-form-field);
+  --vscode-input-border: var(--background-modifier-border);
+  --vscode-button-background: var(--interactive-accent);
+  --vscode-button-foreground: var(--text-on-accent);
+  --vscode-font-family: var(--font-interface);
+}
+
+/* 视图内容区去掉默认内边距,画布自己负责滚动和缩放 */
+.workspace-leaf-content[data-type="weilanx-mind-map"] > .view-content {
+  padding: 0;
+  overflow: hidden;
+}
+.wm-obsidian > .wm-host {
+  height: 100%;
+}
+
+/* 还原表单控件;优先级 (0,1,2) 高于 Obsidian 的通用规则,低于画布组件自身的 `body .wm-root .wm-xxx` */
+body .wm-root :is(button, input, select, textarea) {
+  all: revert;
+  box-sizing: border-box;
+}
