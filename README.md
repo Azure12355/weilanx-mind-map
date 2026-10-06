@@ -27,7 +27,7 @@ An XMind-style mind map editor for VS Code. Each map is a `.wmind` file containi
 ## Quick start
 
 1. Install `weilanx-mind-map.vsix` (Command Palette → `Extensions: Install from VSIX...`).
-2. Right-click a folder → **New Mind Map**, or open any `.wmind` file.
+2. Right-click a folder → **Create Mind Map (.wmind)**, or open any `.wmind` file.
 3. Use **Open as JSON Text** in the editor title bar to view or edit the raw JSON. Text mode has JSON Schema completion and validation.
 
 | Action | Keys |

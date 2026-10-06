@@ -114,12 +114,12 @@
         {
           "command": "wmind.create",
           "when": "explorerResourceIsFolder",
-          "group": "navigation@9"
+          "group": "navigation"
         },
         {
           "command": "wmind.importMarkdown",
           "when": "!explorerResourceIsFolder && resourceExtname =~ /^\\.(md|markdown)$/",
-          "group": "navigation@9"
+          "group": "navigation"
         }
       ],
       "editor/title": [

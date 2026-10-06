@@ -27,7 +27,7 @@
 ## 快速上手
 
 1. 安装 `weilanx-mind-map.vsix`：VS Code 命令面板 → `Extensions: Install from VSIX...`。
-2. 在资源管理器里右键文件夹 → **新建思维导图**；也可以直接打开任意 `.wmind` 文件。
+2. 在资源管理器里右键文件夹 → **创建思维导图 (.wmind)**；也可以直接打开任意 `.wmind` 文件。
 3. 想看或手改 JSON 时，点编辑器右上角的 **以 JSON 文本打开**（文本模式下自带 JSON Schema 补全和校验）。
 
 ### 快捷键
