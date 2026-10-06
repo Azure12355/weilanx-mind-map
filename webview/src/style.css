@@ -1,0 +1,743 @@
+/* 界面外框跟随 VS Code 主题变量;浏览器预览时用后备值 */
+:root {
+  --wm-bg: var(--vscode-editor-background, #ffffff);
+  --wm-fg: var(--vscode-foreground, #24292f);
+  --wm-muted: var(--vscode-descriptionForeground, #6e7781);
+  --wm-border: var(--vscode-panel-border, var(--vscode-widget-border, rgba(128, 128, 128, 0.25)));
+  --wm-bar: var(--vscode-sideBar-background, var(--vscode-editor-background, #f6f8fa));
+  --wm-hover: var(--vscode-toolbar-hoverBackground, rgba(128, 128, 128, 0.14));
+  --wm-active: var(--vscode-toolbar-activeBackground, rgba(47, 123, 255, 0.16));
+  --wm-accent: var(--vscode-focusBorder, #2f7bff);
+  --wm-input-bg: var(--vscode-input-background, #ffffff);
+  --wm-input-border: var(--vscode-input-border, rgba(128, 128, 128, 0.35));
+  --wm-btn-bg: var(--vscode-button-background, #2f7bff);
+  --wm-btn-fg: var(--vscode-button-foreground, #ffffff);
+  --wm-pop: var(--vscode-editorWidget-background, #ffffff);
+  --wm-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  --wm-font: var(--vscode-font-family, -apple-system, BlinkMacSystemFont, "PingFang SC", "Segoe UI", sans-serif);
+}
+body:not([class*="vscode"]) .wm-dark,
+body:not([class*="vscode"]) .wm-dark * {
+  --wm-bg: #1e1f22;
+  --wm-fg: #e3e5e8;
+  --wm-muted: #9aa0a6;
+  --wm-bar: #25262a;
+  --wm-input-bg: #2b2d31;
+  --wm-pop: #2b2d31;
+}
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  font-family: var(--wm-font);
+  font-size: 13px;
+  color: var(--wm-fg);
+  background: var(--wm-bg);
+}
+button {
+  font: inherit;
+  color: inherit;
+}
+.wm-app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: var(--wm-fg);
+  background: var(--wm-bg);
+}
+.wm-loading {
+  height: 100%;
+}
+
+/* ---------- 工具栏 ---------- */
+.wm-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--wm-border);
+  background: var(--wm-bar);
+  flex-shrink: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.wm-tb-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.wm-tb-sep {
+  width: 1px;
+  height: 20px;
+  background: var(--wm-border);
+  margin: 0 6px;
+  flex-shrink: 0;
+}
+.wm-tb-spacer {
+  flex: 1;
+  min-width: 8px;
+}
+.wm-tb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 28px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.wm-tb-btn:hover:not(:disabled) {
+  background: var(--wm-hover);
+}
+.wm-tb-btn.wm-active {
+  background: var(--wm-active);
+}
+.wm-tb-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.wm-menu {
+  position: relative;
+}
+.wm-popover {
+  position: fixed;
+  margin-top: 4px;
+  transform: translateX(-30%);
+  z-index: 50;
+  padding: 8px;
+  border: 1px solid var(--wm-border);
+  border-radius: 10px;
+  background: var(--wm-pop);
+  box-shadow: var(--wm-shadow);
+}
+.wm-menu-list {
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+.wm-menu-list button {
+  text-align: left;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.wm-menu-list button:hover {
+  background: var(--wm-hover);
+}
+.wm-seg {
+  display: inline-flex;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 7px;
+  background: var(--wm-hover);
+}
+.wm-seg button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 24px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+}
+.wm-seg button.wm-active {
+  background: var(--wm-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+.wm-seg-full {
+  display: flex;
+  width: 100%;
+}
+.wm-seg-full button {
+  flex: 1;
+}
+.wm-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 6px 6px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 12px;
+}
+.wm-card:hover {
+  background: var(--wm-hover);
+}
+.wm-card.wm-active {
+  border-color: var(--wm-accent);
+}
+.wm-theme-grid,
+.wm-struct-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+.wm-struct-grid {
+  grid-template-columns: repeat(2, 1fr);
+  min-width: 200px;
+}
+.wm-theme-grid {
+  min-width: 250px;
+}
+.wm-theme-grid-panel,
+.wm-struct-grid-panel {
+  min-width: 0;
+}
+
+/* ---------- 主区域 ---------- */
+.wm-main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+.wm-stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+.wm-canvas {
+  position: absolute;
+  inset: 0;
+  cursor: default;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.wm-canvas.wm-panning {
+  cursor: grabbing;
+}
+.wm-canvas.wm-linking {
+  cursor: crosshair;
+}
+.wm-svg {
+  display: block;
+}
+.wm-topic {
+  cursor: pointer;
+}
+.wm-topic .wm-hover {
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.wm-topic:hover .wm-hover {
+  opacity: 1;
+}
+.wm-ghost {
+  opacity: 0.75;
+  pointer-events: none;
+}
+.wm-fold {
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.wm-topic:hover .wm-fold,
+.wm-fold.wm-fold-on {
+  opacity: 1;
+}
+[data-kind="rel"],
+[data-kind="boundary"] {
+  cursor: pointer;
+}
+[data-kind="link-icon"],
+[data-kind="note-icon"] {
+  cursor: pointer;
+}
+
+/* 文字输入框:不编辑时透明地停在选中节点上,接收快捷键与输入法 */
+.wm-editor {
+  position: absolute;
+  z-index: 5;
+  opacity: 0;
+  pointer-events: none;
+  resize: none;
+  border: none;
+  outline: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  text-align: center;
+  field-sizing: content;
+  max-width: 600px;
+  width: 1px;
+  height: 1px;
+  caret-color: transparent;
+}
+.wm-editor.wm-editing {
+  opacity: 1;
+  pointer-events: auto;
+  width: auto;
+  height: auto;
+  caret-color: auto;
+  box-shadow: 0 0 0 2px #2f7bff, 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.wm-zoom {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  border: 1px solid var(--wm-border);
+  border-radius: 9px;
+  background: var(--wm-pop);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.wm-zoom button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.wm-zoom button:hover {
+  background: var(--wm-hover);
+}
+.wm-zoom-pct {
+  min-width: 48px !important;
+  font-variant-numeric: tabular-nums;
+  font-size: 12px;
+}
+.wm-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 8px;
+  background: rgba(30, 32, 36, 0.92);
+  color: #fff;
+  font-size: 12px;
+  pointer-events: none;
+  z-index: 20;
+}
+.wm-issues {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  max-width: min(640px, 90%);
+  padding: 6px 12px;
+  border: 1px solid rgba(245, 166, 35, 0.5);
+  border-radius: 8px;
+  background: var(--wm-pop);
+  box-shadow: var(--wm-shadow);
+  font-size: 12px;
+}
+.wm-issues-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #d48806;
+}
+.wm-issues ul {
+  margin: 6px 0 2px;
+  padding-left: 18px;
+  max-height: 200px;
+  overflow: auto;
+  color: var(--wm-fg);
+}
+.wm-link-btn {
+  border: none;
+  background: none;
+  color: var(--wm-accent);
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ---------- 格式面板 ---------- */
+.wm-panel {
+  width: 272px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--wm-border);
+  background: var(--wm-bar);
+}
+.wm-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--wm-border);
+}
+.wm-tabs {
+  display: flex;
+  gap: 4px;
+}
+.wm-tabs button {
+  padding: 4px 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--wm-muted);
+}
+.wm-tabs button.wm-active {
+  background: var(--wm-hover);
+  color: var(--wm-fg);
+}
+.wm-tabs button:disabled {
+  opacity: 0.4;
+}
+.wm-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  color: var(--wm-muted);
+}
+.wm-icon-btn:hover {
+  background: var(--wm-hover);
+  color: var(--wm-fg);
+}
+.wm-panel-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 12px 16px;
+}
+.wm-fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.wm-sec {
+  padding: 10px 0;
+  border-bottom: 1px solid var(--wm-border);
+}
+.wm-sec-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--wm-muted);
+  text-transform: uppercase;
+}
+.wm-sel-count {
+  padding: 8px 0 0;
+  color: var(--wm-muted);
+  font-size: 12px;
+}
+.wm-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+.wm-row-label {
+  flex-shrink: 0;
+  min-width: 44px;
+  color: var(--wm-muted);
+  font-size: 12px;
+}
+.wm-select,
+.wm-input {
+  width: 100%;
+  min-width: 0;
+  padding: 5px 8px;
+  border: 1px solid var(--wm-input-border);
+  border-radius: 6px;
+  background: var(--wm-input-bg);
+  color: var(--wm-fg);
+  font: inherit;
+  outline: none;
+}
+.wm-select:focus,
+.wm-input:focus {
+  border-color: var(--wm-accent);
+}
+textarea.wm-input {
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.5;
+}
+.wm-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.wm-swatch {
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-radius: 5px;
+  cursor: pointer;
+  position: relative;
+}
+.wm-swatch.wm-active {
+  box-shadow: 0 0 0 2px var(--wm-bg), 0 0 0 3.5px var(--wm-accent);
+}
+.wm-swatch-none {
+  background: linear-gradient(135deg, transparent 45%, #e5484d 45%, #e5484d 55%, transparent 55%), var(--wm-input-bg);
+}
+.wm-swatch-custom {
+  background: conic-gradient(#f0604d, #f5a623, #f8d74a, #3db47a, #2f9bea, #7c63f2, #e3578f, #f0604d);
+  overflow: hidden;
+}
+.wm-swatch-custom input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+.wm-chip {
+  height: 20px;
+  padding: 0 7px;
+  border: 1px solid var(--wm-input-border);
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+}
+.wm-chip.wm-active {
+  border-color: var(--wm-accent);
+  color: var(--wm-accent);
+}
+.wm-shapes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+}
+.wm-shape {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  background: var(--wm-hover);
+  cursor: pointer;
+}
+.wm-shape.wm-active {
+  border-color: var(--wm-accent);
+}
+.wm-marker-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-bottom: 6px;
+}
+.wm-marker-row .wm-row-label {
+  padding-top: 4px;
+}
+.wm-markers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+.wm-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.wm-marker:hover {
+  background: var(--wm-hover);
+}
+.wm-marker.wm-active {
+  border-color: var(--wm-accent);
+  background: var(--wm-active);
+}
+.wm-labels {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.wm-label-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px 2px 9px;
+  border-radius: 10px;
+  background: var(--wm-active);
+  font-size: 12px;
+}
+.wm-label-chip button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--wm-muted);
+  padding: 0 3px;
+}
+.wm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--wm-input-border);
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.wm-btn:hover {
+  background: var(--wm-hover);
+}
+.wm-btn-block {
+  width: 100%;
+  margin-top: 10px;
+}
+.wm-btn-primary {
+  border-color: transparent;
+  background: var(--wm-btn-bg);
+  color: var(--wm-btn-fg);
+}
+.wm-btn-primary:hover {
+  filter: brightness(1.08);
+  background: var(--wm-btn-bg);
+}
+.wm-btn-danger {
+  color: #e5484d;
+}
+.wm-row .wm-btn {
+  flex: 1;
+}
+.wm-stats {
+  color: var(--wm-muted);
+  font-size: 12px;
+}
+
+/* ---------- 大纲 ---------- */
+.wm-outline {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+}
+.wm-outline-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 24px 120px;
+}
+.wm-orow {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  border-radius: 6px;
+}
+.wm-orow.wm-active {
+  background: var(--wm-hover);
+}
+.wm-obullet {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  background: none;
+}
+.wm-obullet span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--wm-muted);
+}
+.wm-obullet.wm-has-kids {
+  cursor: pointer;
+}
+.wm-obullet.wm-collapsed span {
+  width: 10px;
+  height: 10px;
+  background: var(--wm-muted);
+  box-shadow: 0 0 0 3px var(--wm-hover);
+}
+.wm-otext {
+  flex: 1;
+  min-width: 0;
+  padding: 4px 4px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  color: var(--wm-fg);
+  font: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  field-sizing: content;
+}
+.wm-orow-root .wm-otext {
+  font-size: 22px;
+  line-height: 30px;
+  font-weight: 600;
+}
+.wm-orow-root .wm-obullet {
+  height: 38px;
+}
+
+/* ---------- 错误页 ---------- */
+.wm-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 24px;
+}
+.wm-error-card {
+  max-width: 520px;
+  text-align: center;
+}
+.wm-error-icon {
+  color: #e5484d;
+  transform: scale(2);
+  margin-bottom: 16px;
+}
+.wm-error-card h2 {
+  font-size: 16px;
+  margin: 0 0 8px;
+}
+.wm-error-pos {
+  color: var(--wm-muted);
+}
+.wm-error-card pre {
+  text-align: left;
+  white-space: pre-wrap;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--wm-hover);
+  font-size: 12px;
+}

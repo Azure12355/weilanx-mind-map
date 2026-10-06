@@ -179,3 +179,14 @@ export function fromMarkdown(md: string, fallbackTitle = "中心主题"): MindDo
   tidy(r);
   return { version: FORMAT_VERSION, root: r };
 }
+
+/** 粘贴的文本 → 节点列表:Markdown 大纲按结构解析;普通文本每行一个节点,按缩进分层 */
+export function textToTopics(text: string): Topic[] {
+  const lines = text.replace(/\r\n?/g, "\n").split("\n").filter((l) => l.trim());
+  if (!lines.length) return [];
+  const structured = lines.some((l) => /^\s*(#{1,6}\s|[-*+]\s|\d+[.)]\s)/.test(l));
+  const md = structured ? lines.join("\n") : lines.map((l) => `${/^\s*/.exec(l)![0]}- ${l.trim()}`).join("\n");
+  const SENTINEL = "\u0000";
+  const doc = fromMarkdown(md, SENTINEL);
+  return doc.root.text === SENTINEL ? (doc.root.children ?? []) : [doc.root];
+}

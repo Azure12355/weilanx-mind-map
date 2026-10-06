@@ -260,10 +260,20 @@ function addRanges(t: Topic, ctx: Ctx, sub: Sub, children: Topic[], subs: Sub[],
     sub.boundaries.push(g);
     grow(sub, { x0: g.x, y0: g.y, x1: g.x + g.w, y1: g.y + g.h });
   }
+  /** 已放好的概括(括号 + 概括主题)占用的区域,后面的概括与之重叠时向外让开 */
+  const placed: { x0: number; y0: number; x1: number; y1: number }[] = [];
   for (const s of t.summaries ?? []) {
     if (filter && !filter(rangeIdx(children, s)[0])) continue;
     const box = span(s);
     if (!box) continue;
+    for (const q of placed) {
+      if (side === "down") {
+        if (q.x0 < box.x1 && q.x1 > box.x0) box.y1 = Math.max(box.y1, q.y1);
+      } else if (q.y0 < box.y1 && q.y1 > box.y0) {
+        if (side === "right") box.x1 = Math.max(box.x1, q.x1);
+        else box.x0 = Math.min(box.x0, q.x0);
+      }
+    }
     // 括号要把同一范围上的外框也包进去
     for (const g of sub.boundaries) {
       if (g.ownerId !== t.id) continue;
@@ -294,6 +304,7 @@ function addRanges(t: Topic, ctx: Ctx, sub: Sub, children: Topic[], subs: Sub[],
       ny = (box.y0 + box.y1) / 2 - sz.h / 2;
     }
     sub.summaries.push(geo);
+    placed.push({ x0: Math.min(geo.x0, nx), y0: Math.min(geo.y0, ny), x1: Math.max(geo.x1, nx + sz.w), y1: Math.max(geo.y1, ny + sz.h) });
     const node: NodeBox = { id: s.id, kind: "summary", depth: depth + 1, parentId: t.id, x: nx, y: ny, w: sz.w, h: sz.h, orient: "h", dir: side === "left" ? -1 : 1, outX: 0, outY: 0 };
     sub.nodes.push(node);
     grow(sub, { x0: Math.min(geo.x0, nx), y0: Math.min(geo.y0, ny), x1: Math.max(geo.x1, nx + sz.w), y1: Math.max(geo.y1, ny + sz.h) });

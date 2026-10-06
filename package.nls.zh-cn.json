@@ -1,0 +1,18 @@
+{
+  "displayName": "Weilanx Mind Map 思维导图",
+  "description": "XMind 风格的思维导图编辑器,数据就是一个 .wmind JSON 文件,对人和 AI Agent 都友好",
+  "category": "思维导图",
+  "customEditor.displayName": "思维导图",
+  "command.create": "新建思维导图",
+  "command.importMarkdown": "从 Markdown 大纲生成思维导图",
+  "command.openAsText": "以 JSON 文本打开",
+  "command.openAsMindMap": "以思维导图打开",
+  "command.undo": "撤销",
+  "command.redo": "重做",
+  "command.zoomIn": "放大",
+  "command.zoomOut": "缩小",
+  "command.fit": "适应画布",
+  "command.export": "导出",
+  "configuration.title": "思维导图",
+  "config.autoSave": "每次编辑后立即保存文件,保证 Agent 和其他工具读到的总是最新内容"
+}

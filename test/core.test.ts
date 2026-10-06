@@ -365,3 +365,17 @@ test("布局:自由主题按 position 放置", () => {
   assert.equal(f.y, -300);
   assert.ok(f.floatingRoot);
 });
+
+test("布局:同一范围的多个概括依次向外排开", () => {
+  let d = doc();
+  const s1 = ops.addRange(d, "summaries", ["a00002", "a00004"], "一")!;
+  const s2 = ops.addRange(s1.doc, "summaries", ["a00002", "a00004"], "二")!;
+  d = s2.doc;
+  const sz = sizes(d);
+  sz.set(s1.id, { w: 60, h: 30 });
+  sz.set(s2.id, { w: 60, h: 30 });
+  const r = layout(d, sz);
+  const a = r.nodes.get(s1.id)!;
+  const b = r.nodes.get(s2.id)!;
+  assert.ok(b.x >= a.x + a.w);
+});

@@ -27,7 +27,215 @@
   ],
   "main": "./out/extension.js",
   "activationEvents": [],
-  "contributes": {},
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "weilanx.mindMap",
+        "displayName": "%customEditor.displayName%",
+        "selector": [
+          {
+            "filenamePattern": "*.wmind"
+          }
+        ],
+        "priority": "default"
+      }
+    ],
+    "languages": [
+      {
+        "id": "json",
+        "extensions": [
+          ".wmind"
+        ]
+      }
+    ],
+    "jsonValidation": [
+      {
+        "fileMatch": "*.wmind",
+        "url": "./schema/wmind.schema.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "wmind.create",
+        "title": "%command.create%",
+        "category": "%category%",
+        "icon": "$(add)"
+      },
+      {
+        "command": "wmind.importMarkdown",
+        "title": "%command.importMarkdown%",
+        "category": "%category%"
+      },
+      {
+        "command": "wmind.openAsText",
+        "title": "%command.openAsText%",
+        "category": "%category%",
+        "icon": "$(json)"
+      },
+      {
+        "command": "wmind.openAsMindMap",
+        "title": "%command.openAsMindMap%",
+        "category": "%category%",
+        "icon": "$(type-hierarchy)"
+      },
+      {
+        "command": "wmind.undo",
+        "title": "%command.undo%",
+        "category": "%category%"
+      },
+      {
+        "command": "wmind.redo",
+        "title": "%command.redo%",
+        "category": "%category%"
+      },
+      {
+        "command": "wmind.zoomIn",
+        "title": "%command.zoomIn%",
+        "category": "%category%"
+      },
+      {
+        "command": "wmind.zoomOut",
+        "title": "%command.zoomOut%",
+        "category": "%category%"
+      },
+      {
+        "command": "wmind.fit",
+        "title": "%command.fit%",
+        "category": "%category%"
+      },
+      {
+        "command": "wmind.export",
+        "title": "%command.export%",
+        "category": "%category%"
+      }
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "wmind.create",
+          "when": "explorerResourceIsFolder",
+          "group": "navigation@9"
+        },
+        {
+          "command": "wmind.importMarkdown",
+          "when": "!explorerResourceIsFolder && resourceExtname =~ /^\\.(md|markdown)$/",
+          "group": "navigation@9"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "wmind.openAsText",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'",
+          "group": "navigation"
+        },
+        {
+          "command": "wmind.openAsMindMap",
+          "when": "resourceExtname == .wmind && activeEditor == workbench.editors.files.textFileEditor",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "wmind.undo",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.redo",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.zoomIn",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.zoomOut",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.fit",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.export",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.openAsText",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.openAsMindMap",
+          "when": "resourceExtname == .wmind"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "wmind.undo",
+        "key": "ctrl+z",
+        "mac": "cmd+z",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.redo",
+        "key": "ctrl+y",
+        "mac": "cmd+shift+z",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.redo",
+        "key": "ctrl+shift+z",
+        "mac": "cmd+y",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.zoomIn",
+        "key": "ctrl+=",
+        "mac": "cmd+=",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.zoomIn",
+        "key": "ctrl+numpad_add",
+        "mac": "cmd+numpad_add",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.zoomOut",
+        "key": "ctrl+-",
+        "mac": "cmd+-",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.zoomOut",
+        "key": "ctrl+numpad_subtract",
+        "mac": "cmd+numpad_subtract",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.fit",
+        "key": "ctrl+0",
+        "mac": "cmd+0",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.export",
+        "key": "ctrl+shift+e",
+        "mac": "cmd+shift+e",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      }
+    ],
+    "configuration": {
+      "title": "%configuration.title%",
+      "properties": {
+        "wmind.autoSave": {
+          "type": "boolean",
+          "default": true,
+          "description": "%config.autoSave%"
+        }
+      }
+    }
+  },
   "scripts": {
     "build:ext": "esbuild src/vscode/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "build:web": "vite build",
