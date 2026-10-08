@@ -281,9 +281,12 @@ export function withAlpha(hex: string, a: number): string {
 
 // ---------- 样式合并 ----------
 
-function resolveLevel(p: Palette, kind: TopicKind, depth: number, branchColor: string, own: Style | undefined): ResolvedStyle {
-  const base = p[kind];
+function resolveLevel(p: Palette, kind: TopicKind, depth: number, branchColor: string, own: Style | undefined, hasChildren = false): ResolvedStyle {
   const s = cleanStyle(own);
+  // 下划线子主题若还有下级,线会像树枝一样从横线上岔出去,默认改成圆角框
+  const base = kind === "sub" && hasChildren && !s.shape && p.sub.shape === "underline"
+    ? { ...p.sub, shape: "rounded" as Shape, padX: 10, padY: 6 }
+    : p[kind];
   const pick = (v: string) => (v === "branch" ? branchColor : v === "text" ? p.text : v);
   const fill = (s.fill as string | undefined) ?? pick(base.fill);
   const bg = fill === "none" ? p.background : fill;
@@ -325,7 +328,7 @@ export function resolveAll(doc: MindDoc, dark: boolean): { palette: Palette; sty
   const styles = new Map<string, ResolvedStyle>();
   const rb = p.rainbow;
   const visit = (t: Topic, depth: number, branch: string, kind: TopicKind) => {
-    const st = resolveLevel(p, kind, depth, branch, t.style);
+    const st = resolveLevel(p, kind, depth, branch, t.style, !!t.children?.length);
     styles.set(t.id, st);
     const children = t.children ?? [];
     children.forEach((c, i) => {
