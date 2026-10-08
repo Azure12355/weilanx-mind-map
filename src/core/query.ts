@@ -159,6 +159,20 @@ export function search(doc: MindDoc, keyword: string): Topic[] {
   return out;
 }
 
+/** 按节点文字查找(搜索 / 替换用),返回 id,顺序同大纲:中心主题树在前,自由主题在后 */
+export function findText(doc: MindDoc, keyword: string, caseSensitive = false): string[] {
+  if (!keyword) return [];
+  const k = caseSensitive ? keyword : keyword.toLowerCase();
+  const out: string[] = [];
+  const visit = (t: Topic) =>
+    walk(t, (x) => {
+      if ((caseSensitive ? x.text : x.text.toLowerCase()).includes(k)) out.push(x.id);
+    });
+  visit(doc.root);
+  for (const f of doc.floating ?? []) visit(f);
+  return out;
+}
+
 // ---------- 大纲 ----------
 
 export interface OutlineOptions {

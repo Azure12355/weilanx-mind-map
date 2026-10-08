@@ -5,7 +5,7 @@ import { docTheme } from "../../src/core/doc";
 import { setDocProp } from "../../src/core/ops";
 import { getTopic } from "../../src/core/query";
 import type { Structure } from "../../src/core/types";
-import type { Actions } from "./App";
+import type { Actions, ViewPrefs } from "./App";
 import { Icon } from "./icons";
 import { langIsZh, t } from "./i18n";
 import { StructureIcon, ThemeSwatch } from "./FormatPanel";
@@ -19,7 +19,7 @@ function Btn({ icon, label, onClick, disabled, active, title }: { icon: ReactNod
   );
 }
 
-function Menu({ icon, label, children, disabled }: { icon: ReactNode; label: string; children: (close: () => void) => ReactNode; disabled?: boolean }) {
+function Menu({ icon, label, children, disabled, iconOnly, alignRight }: { icon: ReactNode; label: string; children: (close: () => void) => ReactNode; disabled?: boolean; iconOnly?: boolean; alignRight?: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -34,17 +34,28 @@ function Menu({ icon, label, children, disabled }: { icon: ReactNode; label: str
     <div className="wm-menu" ref={ref}>
       <button className={"wm-tb-btn" + (open ? " wm-active" : "")} onClick={() => setOpen((o) => !o)} disabled={disabled} title={label}>
         {icon}
-        <span>{label}</span>
+        {!iconOnly && <span>{label}</span>}
         <Icon.chevron />
       </button>
-      {open && <div className="wm-popover">{children(() => setOpen(false))}</div>}
+      {open && <div className={"wm-popover" + (alignRight ? " wm-popover-right" : "")}>{children(() => setOpen(false))}</div>}
     </div>
   );
 }
 
+function Switch({ label, on, onChange }: { label: string; on: boolean; onChange: (on: boolean) => void }) {
+  return (
+    <button className="wm-switch-row" role="switch" aria-checked={on} onClick={() => onChange(!on)}>
+      <span>{label}</span>
+      <span className={"wm-switch" + (on ? " wm-on" : "")} />
+    </button>
+  );
+}
+
+const isMac = /Mac|iPhone|iPad/.test(navigator.platform);
+
 const STRUCTS: Structure[] = ["map", "logic", "org", "tree"];
 
-export function Toolbar({ actions: a, view, setView, panel, togglePanel }: { actions: Actions; view: "map" | "outline"; setView: (v: "map" | "outline") => void; panel: boolean; togglePanel: () => void }) {
+export function Toolbar({ actions: a, view, setView, panel, togglePanel, laser, toggleLaser, prefs, setPrefs, openSearch }: { openSearch: () => void; actions: Actions; view: "map" | "outline"; setView: (v: "map" | "outline") => void; panel: boolean; togglePanel: () => void; laser: boolean; toggleLaser: () => void; prefs: ViewPrefs; setPrefs: (p: Partial<ViewPrefs>) => void }) {
   const topics = a.selection.filter((id) => !!getTopic(a.doc, id));
   const one = topics.length === 1;
   const ro = a.readOnly;
@@ -67,6 +78,11 @@ export function Toolbar({ actions: a, view, setView, panel, togglePanel }: { act
       </div>
       <div className="wm-tb-spacer" />
       <div className="wm-tb-group">
+        <Btn icon={<Icon.search />} onClick={openSearch} disabled={view !== "map"} title={`${t("find")} (${isMac ? "⌘F" : "Ctrl+F"})`} />
+        <Btn icon={<Icon.laser />} label={t("laserShort")} onClick={toggleLaser} active={laser} disabled={view !== "map"} title={t("laser")} />
+      </div>
+      <div className="wm-tb-sep" />
+      <div className="wm-tb-group">
         <Menu icon={<Icon.structure />} label={t("structure")} disabled={ro}>
           {(close) => (
             <div className="wm-struct-grid">
@@ -81,25 +97,6 @@ export function Toolbar({ actions: a, view, setView, panel, togglePanel }: { act
                 >
                   <StructureIcon s={s} />
                   <span>{t(`structure.${s}`)}</span>
-                </button>
-              ))}
-            </div>
-          )}
-        </Menu>
-        <Menu icon={<Icon.theme />} label={t("theme")} disabled={ro}>
-          {(close) => (
-            <div className="wm-theme-grid">
-              {THEMES.map((th) => (
-                <button
-                  key={th.id}
-                  className={"wm-card" + (th.id === theme ? " wm-active" : "")}
-                  onClick={() => {
-                    a.apply((d) => setDocProp(d, "theme", th.id));
-                    close();
-                  }}
-                >
-                  <ThemeSwatch id={th.id} dark={a.dark} />
-                  <span>{langIsZh() ? th.zh : th.en}</span>
                 </button>
               ))}
             </div>
@@ -125,6 +122,32 @@ export function Toolbar({ actions: a, view, setView, panel, togglePanel }: { act
       </div>
       <div className="wm-tb-sep" />
       <div className="wm-tb-group">
+        <Menu icon={<Icon.settings />} label={t("settings")} iconOnly alignRight>
+          {(close) => (
+            <div className="wm-settings">
+              <div className="wm-settings-title">{t("display")}</div>
+              <Switch label={t("showBranches")} on={prefs.showBranches} onChange={(on) => setPrefs({ showBranches: on })} />
+              <Switch label={t("showRelationships")} on={prefs.showRelationships} onChange={(on) => setPrefs({ showRelationships: on })} />
+              <div className="wm-settings-title">{t("theme")}</div>
+              <div className="wm-theme-grid">
+                {THEMES.map((th) => (
+                  <button
+                    key={th.id}
+                    className={"wm-card" + (th.id === theme ? " wm-active" : "")}
+                    disabled={ro}
+                    onClick={() => {
+                      a.apply((d) => setDocProp(d, "theme", th.id));
+                      close();
+                    }}
+                  >
+                    <ThemeSwatch id={th.id} dark={a.dark} />
+                    <span>{langIsZh() ? th.zh : th.en}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </Menu>
         <div className="wm-seg">
           <button className={view === "map" ? "wm-active" : ""} onClick={() => setView("map")} title={t("mapView")}>
             <Icon.map />

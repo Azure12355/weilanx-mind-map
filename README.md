@@ -153,6 +153,8 @@ curl -fsSL https://raw.githubusercontent.com/Azure12355/weilanx-mind-map/main/sc
 | Delete | `Delete` / `Backspace` |
 | Navigate / swap with sibling | Arrow keys / `Cmd+↑` `Cmd+↓` |
 | Fold / unfold | `Cmd+/` or click the dot at the branch end |
+| Expand / collapse a whole subtree | Right-click a topic → Expand all / Collapse all |
+| Find / replace | `Cmd+F` / `Ctrl+H` (`Cmd+Option+F` also works on Mac) |
 | Undo / redo | `Cmd+Z` / `Cmd+Shift+Z` |
 | Zoom in / out / fit | `Cmd+=` / `Cmd+-` / `Cmd+0` |
 | Pan / zoom | Drag background, Space + drag / `Cmd` + wheel, pinch |

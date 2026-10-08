@@ -13,7 +13,7 @@ type InMsg =
   | { type: "notify"; level: "info" | "warn" | "error"; message: string };
 
 /** 扩展 → webview 的快捷键命令 */
-export type HostCommand = "undo" | "redo" | "zoomIn" | "zoomOut" | "fit" | "export";
+export type HostCommand = "undo" | "redo" | "zoomIn" | "zoomOut" | "fit" | "export" | "find" | "replace";
 
 export class MindMapEditorProvider implements vscode.CustomTextEditorProvider {
   static readonly viewType = "weilanx.mindMap";

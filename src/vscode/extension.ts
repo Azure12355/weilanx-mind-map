@@ -45,6 +45,8 @@ export function activate(context: vscode.ExtensionContext) {
     "wmind.zoomOut": "zoomOut",
     "wmind.fit": "fit",
     "wmind.export": "export",
+    "wmind.find": "find",
+    "wmind.replace": "replace",
   };
   for (const [id, command] of Object.entries(hostCommands)) {
     context.subscriptions.push(vscode.commands.registerCommand(id, () => MindMapController.active?.runCommand(command)));

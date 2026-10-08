@@ -31,6 +31,8 @@ export interface CanvasApi {
   setControls(relId: string, controls: [Point, Point], commit: boolean): void;
   cancelLinking(): void;
   focusCapture(): void;
+  /** 在主题上右键,坐标是窗口坐标 */
+  contextMenu(id: string, x: number, y: number): void;
 }
 
 interface Props {
@@ -44,6 +46,12 @@ interface Props {
   onSize: (w: number, h: number) => void;
   spaceHeld: React.MutableRefObject<{ down: boolean; used: boolean }>;
   api: CanvasApi;
+  /** 显示设置:分支线 / 联系线 */
+  showBranches: boolean;
+  showRelationships: boolean;
+  /** 查找命中的主题与当前项 */
+  matches: Set<string>;
+  currentMatch: string | null;
 }
 
 type Drag =
@@ -52,7 +60,7 @@ type Drag =
   | { mode: "node"; ids: string[]; sx: number; sy: number; dx: number; dy: number; moved: boolean; drop: DropTarget | null; grab: Point; clickId: string; plain: boolean }
   | { mode: "handle"; relId: string; which: 0 | 1; controls: [Point, Point] };
 
-export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport, setViewport, onSize, spaceHeld, api }: Props) {
+export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport, setViewport, onSize, spaceHeld, api, showBranches, showRelationships, matches, currentMatch }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const dragRef = useRef<Drag | null>(null);
@@ -338,6 +346,15 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
     if (kind === "topic" || kind === "summary" || kind === "rel" || kind === "boundary") api.startEdit(id);
   };
 
+  const onContextMenu = (e: React.MouseEvent) => {
+    const target = (e.target as Element).closest('[data-kind="topic"]') as HTMLElement | null;
+    const id = target?.dataset.id;
+    if (!id || linkingFrom || drag) return;
+    e.preventDefault();
+    if (!sel.has(id)) api.select([id]);
+    api.contextMenu(id, e.clientX, e.clientY);
+  };
+
   const onMouseMove = (e: React.MouseEvent) => {
     if (linkingFrom) setPointer(toWorld(e.clientX, e.clientY));
   };
@@ -464,6 +481,14 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
   };
 
   const nodes = [...L.nodes.values()];
+  const halos = nodes
+    .filter((b) => matches.has(b.id))
+    .map((b) => {
+      const on = b.id === currentMatch;
+      return (
+        <rect key={b.id} x={b.x - 5} y={b.y - 5} width={b.w + 10} height={b.h + 10} rx={9} fill={on ? "rgba(255, 170, 0, 0.42)" : "rgba(255, 200, 0, 0.26)"} stroke={on ? "#F59E0B" : "none"} strokeWidth={2} />
+      );
+    });
   const v = viewport;
   const marquee = drag?.mode === "marquee" ? normRect(drag.x0, drag.y0, drag.x1, drag.y1) : null;
   const linkSrc = linkingFrom ? L.nodes.get(linkingFrom) : null;
@@ -475,15 +500,17 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
       style={{ background: P.background }}
       onPointerDown={onPointerDown}
       onDoubleClick={onDoubleClick}
+      onContextMenu={onContextMenu}
       onMouseMove={onMouseMove}
     >
       <svg className="wm-svg" width="100%" height="100%">
         <g className="wm-world" transform={`translate(${v.x},${v.y}) scale(${v.k})`}>
           <g>{boundaries}</g>
-          <g>{edges}</g>
+          {halos.length > 0 && <g className="wm-ui">{halos}</g>}
+          {showBranches && <g>{edges}</g>}
           <g>{summaries}</g>
           <g>{nodes.map((b) => (dragging.has(b.id) ? <g key={b.id} opacity={0.35}>{renderNode(b)}</g> : renderNode(b)))}</g>
-          <g>{rels}</g>
+          {showRelationships && <g>{rels}</g>}
           {nodeDrag && <g className="wm-ui">{nodes.filter((b) => dragging.has(b.id)).map((b) => renderNode(b, true))}</g>}
           {nodeDrag?.drop?.type === "sibling" && (
             <line

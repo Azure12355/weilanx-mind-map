@@ -1,7 +1,7 @@
 // 编辑操作:输入旧文档,输出新文档(不可变,未改动的子树保持原引用)
 import { genId } from "./id";
 import { markerCategory } from "./markers";
-import { allIds, Entry, getTopic, indexDoc, isInSubtree, subtreeIds } from "./query";
+import { allIds, Entry, getTopic, indexDoc, isInSubtree, subtreeIds, walk } from "./query";
 import { MindDoc, Point, Range, Relationship, Style, Topic } from "./types";
 
 export class OpError extends Error {}
@@ -94,6 +94,36 @@ export function setAllCollapsed(doc: MindDoc, collapsed: boolean, minDepth = 1):
     if (e.depth >= minDepth && e.topic.children?.length && !!e.topic.collapsed !== collapsed) ids.push(id);
   }
   return setCollapsed(doc, ids, collapsed);
+}
+
+/** 展开 / 收起某个节点及其全部后代(中心主题本身不收起) */
+export function setSubtreeCollapsed(doc: MindDoc, id: string, collapsed: boolean): MindDoc {
+  const ids: string[] = [];
+  walk(entry(doc, id).topic, (t) => {
+    if (collapsed && t.id === doc.root.id) return;
+    if (t.children?.length && !!t.collapsed !== collapsed) ids.push(t.id);
+  });
+  return setCollapsed(doc, ids, collapsed);
+}
+
+/** 展开某个节点的所有祖先,让它在画布上可见 */
+export function revealTopic(doc: MindDoc, id: string): MindDoc {
+  const idx = indexDoc(doc);
+  const ids: string[] = [];
+  for (let p = idx.get(id)?.parent; p; p = idx.get(p.id)?.parent) if (p.collapsed) ids.push(p.id);
+  return ids.length ? setCollapsed(doc, ids, false) : doc;
+}
+
+/** 在节点文字里查找替换(纯文本,不是正则);没有变化的节点保持原样 */
+export function replaceText(doc: MindDoc, ids: string | string[], find: string, replacement: string, caseSensitive = false): MindDoc {
+  if (!find) return doc;
+  const re = new RegExp(find.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), caseSensitive ? "g" : "gi");
+  for (const id of toList(ids)) {
+    const t = entry(doc, id).topic;
+    const text = t.text.replace(re, () => replacement);
+    if (text !== t.text) doc = setText(doc, id, text);
+  }
+  return doc;
 }
 
 // ---------- 标记 / 标签 ----------

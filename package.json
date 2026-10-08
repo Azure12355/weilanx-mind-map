@@ -107,6 +107,16 @@
         "command": "wmind.export",
         "title": "%command.export%",
         "category": "%category%"
+      },
+      {
+        "command": "wmind.find",
+        "title": "%command.find%",
+        "category": "%category%"
+      },
+      {
+        "command": "wmind.replace",
+        "title": "%command.replace%",
+        "category": "%category%"
       }
     ],
     "menus": {
@@ -157,6 +167,14 @@
         },
         {
           "command": "wmind.export",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.find",
+          "when": "activeCustomEditorId == 'weilanx.mindMap'"
+        },
+        {
+          "command": "wmind.replace",
           "when": "activeCustomEditorId == 'weilanx.mindMap'"
         },
         {
@@ -222,6 +240,24 @@
         "command": "wmind.export",
         "key": "ctrl+shift+e",
         "mac": "cmd+shift+e",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.find",
+        "key": "ctrl+f",
+        "mac": "cmd+f",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.replace",
+        "key": "ctrl+h",
+        "mac": "ctrl+h",
+        "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
+      },
+      {
+        "command": "wmind.replace",
+        "key": "ctrl+h",
+        "mac": "cmd+alt+f",
         "when": "activeCustomEditorId == 'weilanx.mindMap' && !sideBarFocus && !panelFocus && !auxiliaryBarFocus && !inQuickOpen"
       }
     ],

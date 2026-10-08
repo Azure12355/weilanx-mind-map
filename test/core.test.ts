@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { parse, serialize, validate } from "../src/core/doc";
 import * as ops from "../src/core/ops";
-import { findByPath, getTopic, indexDoc, outline, resolveRef, splitPath, topicPath } from "../src/core/query";
+import { findByPath, findText, getTopic, indexDoc, outline, resolveRef, splitPath, topicPath } from "../src/core/query";
 import { fromMarkdown, markdownLosses, toMarkdown } from "../src/core/markdown";
 import { layout, NodeSize } from "../src/core/layout";
 import { resolveAll, contrastText } from "../src/core/theme";
@@ -207,6 +207,41 @@ test("ops:样式 / 标记同类互斥 / 标签 / 折叠", () => {
   assert.equal(getTopic(d, "a00001")!.collapsed, true);
   d = ops.addChild(d, "a00001").doc;
   assert.equal(getTopic(d, "a00001")!.collapsed, undefined);
+});
+
+test("ops:整棵子树展开 / 收起,中心主题本身不收起", () => {
+  let d = doc();
+  d = ops.addChild(d, "a00002", { text: "深访" }).doc;
+  d = ops.setSubtreeCollapsed(d, "root01", true);
+  assert.equal(getTopic(d, "root01")!.collapsed, undefined);
+  assert.equal(getTopic(d, "a00001")!.collapsed, true);
+  assert.equal(getTopic(d, "a00002")!.collapsed, true);
+  assert.equal(getTopic(d, "b00001")!.collapsed, undefined);
+  d = ops.setSubtreeCollapsed(d, "a00001", false);
+  assert.equal(getTopic(d, "a00001")!.collapsed, undefined);
+  assert.equal(getTopic(d, "a00002")!.collapsed, undefined);
+  d = ops.setSubtreeCollapsed(d, "root01", true);
+  d = ops.revealTopic(d, "a00003");
+  assert.equal(getTopic(d, "a00001")!.collapsed, undefined);
+  assert.equal(getTopic(d, "a00002")!.collapsed, true);
+});
+
+test("查找替换:纯文本、大小写、只改命中的节点", () => {
+  let d = doc();
+  d = ops.setText(d, "b00001", "MVP mvp (v1.*)");
+  assert.deepEqual(findText(d, "mvp"), ["b00001"]);
+  assert.deepEqual(findText(d, "MVP", true), ["b00001"]);
+  assert.deepEqual(findText(d, "调"), ["a00001"]);
+  assert.deepEqual(findText(d, ""), []);
+  const before = getTopic(d, "c00001");
+  d = ops.replaceText(d, ["b00001", "c00001"], "mvp", "$&!");
+  assert.equal(getTopic(d, "b00001")!.text, "$&! $&! (v1.*)");
+  assert.equal(getTopic(d, "c00001"), before);
+  d = ops.replaceText(d, "b00001", "(v1.*)", "v2");
+  assert.equal(getTopic(d, "b00001")!.text, "$&! $&! v2");
+  d = ops.setText(d, "b00001", "Aa aa");
+  d = ops.replaceText(d, "b00001", "aa", "b", true);
+  assert.equal(getTopic(d, "b00001")!.text, "Aa b");
 });
 
 test("ops:粘贴子树重新生成 id 并修正内部范围", () => {

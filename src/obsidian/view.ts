@@ -37,6 +37,9 @@ export class WmindView extends TextFileView {
       [["Mod"], "=", "zoomIn"],
       [["Mod"], "-", "zoomOut"],
       [["Mod"], "0", "fit"],
+      [["Mod"], "f", "find"],
+      [["Ctrl"], "h", "replace"],
+      [["Mod", "Alt"], "f", "replace"],
     ];
     for (const [mods, key, c] of keys) this.scope.register(mods as never, key, () => this.command(c));
   }

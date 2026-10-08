@@ -15,7 +15,7 @@ export type OutMsg =
  */
 export type HostKind = "vscode" | "obsidian" | "preview";
 
-export type HostCommand = "undo" | "redo" | "zoomIn" | "zoomOut" | "fit" | "export";
+export type HostCommand = "undo" | "redo" | "zoomIn" | "zoomOut" | "fit" | "export" | "find" | "replace";
 
 export type InMsg =
   | { type: "init"; text: string; lang: string; fileName: string; host: HostKind }

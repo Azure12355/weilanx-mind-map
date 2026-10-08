@@ -55,6 +55,8 @@ export default class WeilanxMindMapPlugin extends Plugin {
     viewCommand("zoom-out", "缩小", "Zoom out", "zoomOut");
     viewCommand("fit", "适应画布", "Fit to screen", "fit");
     viewCommand("export-png", "导出为 PNG 图片", "Export as PNG", "export");
+    viewCommand("find", "查找", "Find", "find");
+    viewCommand("replace", "替换", "Replace", "replace");
 
     // 文件列表右键:文件夹里新建导图;Markdown 笔记转换为导图
     this.registerEvent(

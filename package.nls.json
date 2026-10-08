@@ -13,6 +13,8 @@
   "command.zoomOut": "Zoom Out",
   "command.fit": "Fit to Screen",
   "command.export": "Export",
+  "command.find": "Find",
+  "command.replace": "Replace",
   "configuration.title": "Mind Map",
   "config.autoSave": "Save the file right after every edit so agents and other tools always read the latest content"
 }

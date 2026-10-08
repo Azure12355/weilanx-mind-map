@@ -11,6 +11,9 @@ import { History } from "./history";
 import { buildScene } from "./scene";
 import { Canvas, zoomAt, type CanvasApi, type DropTarget, type Viewport } from "./Canvas";
 import { Toolbar } from "./Toolbar";
+import { Laser } from "./Laser";
+import { SearchBar, type SearchMode } from "./Search";
+import { ContextMenu } from "./ContextMenu";
 import { FormatPanel } from "./FormatPanel";
 import { Outline } from "./Outline";
 import { buildSvg, svgToPngBase64 } from "./export";
@@ -46,6 +49,12 @@ export interface Actions {
   notify(msg: string): void;
 }
 
+/** 只影响显示、不写进文件的设置,记在本机 */
+export interface ViewPrefs {
+  showBranches: boolean;
+  showRelationships: boolean;
+}
+
 function detectDark(): boolean {
   const c = document.body.classList;
   // Obsidian
@@ -78,7 +87,31 @@ export function App({ host }: { host: Host }) {
   const [editing, setEditingState] = useState<Editing | null>(null);
   const editingRef = useRef<Editing | null>(null);
   const [view, setView] = useState<"map" | "outline">("map");
+  const [laser, setLaser] = useState(false);
+  const exitLaser = useCallback(() => setLaser(false), []);
   const [panel, setPanel] = useState(() => localStorage.getItem("wmind-panel") !== "0");
+  const [prefs, setPrefsState] = useState<ViewPrefs>(() => ({
+    showBranches: localStorage.getItem("wmind-branches") !== "0",
+    showRelationships: localStorage.getItem("wmind-relationships") !== "0",
+  }));
+  const setPrefs = (p: Partial<ViewPrefs>) =>
+    setPrefsState((old) => {
+      const next = { ...old, ...p };
+      localStorage.setItem("wmind-branches", next.showBranches ? "1" : "0");
+      localStorage.setItem("wmind-relationships", next.showRelationships ? "1" : "0");
+      return next;
+    });
+  const [search, setSearch] = useState<{ mode: SearchMode; n: number } | null>(null);
+  const [found, setFound] = useState<{ ids: Set<string>; current: string | null }>({ ids: new Set(), current: null });
+  const [ctxMenu, setCtxMenu] = useState<{ id: string; x: number; y: number } | null>(null);
+  const closeCtxMenu = useCallback(() => {
+    setCtxMenu(null);
+    // 菜单按钮卸载后焦点会落到 body,还给画布,快捷键才能继续用
+    requestAnimationFrame(() => {
+      const el = document.activeElement;
+      if (!el || el === document.body) captureRef.current?.focus({ preventScroll: true });
+    });
+  }, []);
   const [panelFocus, setPanelFocus] = useState<{ field: "note" | "link"; n: number } | null>(null);
   const [linkingFrom, setLinkingFrom] = useState<string | null>(null);
   const [dark, setDark] = useState(detectDark);
@@ -384,6 +417,46 @@ export function App({ host }: { host: Host }) {
     }
   };
 
+  /** 展开 / 收起某个主题的整棵子树 */
+  const setSubtreeFold = (id: string, collapsed: boolean) => {
+    const d = docRef.current;
+    if (!d) return;
+    safe(() => commit(ops.setSubtreeCollapsed(d, id, collapsed)));
+  };
+
+  // ---------- 查找 / 替换 ----------
+
+  const openSearch = (mode: SearchMode) => {
+    if (editingRef.current) commitEdit();
+    if (view !== "map") setView("map");
+    setSearch((s) => ({ mode: readOnly ? "find" : mode, n: (s?.n ?? 0) + 1 }));
+  };
+
+  const closeSearch = () => {
+    setSearch(null);
+    focusCapture();
+  };
+
+  /** 跳到匹配项:折叠在里面的先展开祖先,再选中并滚动到可见 */
+  const jumpTo = (id: string) => {
+    const d = docRef.current;
+    if (!d) return;
+    const next = ops.revealTopic(d, id);
+    if (next !== d) commit(next);
+    setSelection([id]);
+    requestAnimationFrame(() => reveal(id));
+  };
+
+  const replaceIn = (ids: string[], find: string, replacement: string, caseSensitive: boolean) => {
+    const d = docRef.current;
+    if (!d || readOnly) return;
+    safe(() => {
+      const next = ops.replaceText(d, ids, find, replacement, caseSensitive);
+      commit(next);
+      if (ids.length > 1) notify(t("replaced", ids.filter((id) => getTopic(next, id) !== getTopic(d, id)).length));
+    });
+  };
+
   // ---------- 导出 ----------
 
   const exportAs = async (format: ExportFormat) => {
@@ -466,6 +539,7 @@ export function App({ host }: { host: Host }) {
     else if (c === "zoomOut") zoom(1 / 1.2);
     else if (c === "fit") fit();
     else if (c === "export") exportAs("png");
+    else if (c === "find" || c === "replace") openSearch(c);
   };
   const runRef = useRef(runCommand);
   runRef.current = runCommand;
@@ -508,7 +582,12 @@ export function App({ host }: { host: Host }) {
         e.preventDefault();
         e.stopPropagation();
       };
-      // VS Code 里撤销 / 缩放由宿主命令转发;浏览器预览里自己处理
+      // VS Code 里撤销 / 缩放 / 查找由宿主命令转发;浏览器预览里自己处理
+      if (hostKind === "preview") {
+        if (mod && !e.altKey && key.toLowerCase() === "f") return handled(), openSearch("find");
+        // Mac 上 ⌘H 是系统「隐藏窗口」,替换用 Ctrl+H 或 ⌘⌥F
+        if ((e.ctrlKey && !e.metaKey && key.toLowerCase() === "h") || (isMac && e.metaKey && e.altKey && e.code === "KeyF")) return handled(), openSearch("replace");
+      }
       if (mod && hostKind === "preview") {
         const k = key.toLowerCase();
         if (k === "z" && !e.shiftKey) return handled(), undo();
@@ -558,6 +637,7 @@ export function App({ host }: { host: Host }) {
         case "Escape":
           handled();
           if (linkingFrom) setLinkingFrom(null);
+          else if (search) closeSearch();
           else setSelection([]);
           return;
         case "ArrowUp":
@@ -629,6 +709,7 @@ export function App({ host }: { host: Host }) {
     createRelationship(from, to) {
       const d = docRef.current;
       if (!d) return;
+      if (!prefs.showRelationships) setPrefs({ showRelationships: true });
       safe(() => {
         const r = ops.addRelationship(d, from, to);
         commit(r.doc, [r.id]);
@@ -641,6 +722,10 @@ export function App({ host }: { host: Host }) {
     },
     cancelLinking: () => setLinkingFrom(null),
     focusCapture,
+    contextMenu(id, x, y) {
+      if (editingRef.current) commitEdit();
+      setCtxMenu({ id, x, y });
+    },
   };
 
   const actions: Actions | null = doc
@@ -744,7 +829,7 @@ export function App({ host }: { host: Host }) {
 
   return (
     <div className={"wm-root wm-app" + (dark ? " wm-dark" : "")} ref={rootRef}>
-      <Toolbar actions={actions} view={view} setView={setView} panel={panel} togglePanel={() => setPanel((p) => (localStorage.setItem("wmind-panel", p ? "0" : "1"), !p))} />
+      <Toolbar actions={actions} view={view} setView={setView} panel={panel} togglePanel={() => setPanel((p) => (localStorage.setItem("wmind-panel", p ? "0" : "1"), !p))} laser={laser} toggleLaser={() => setLaser((l) => !l)} prefs={prefs} setPrefs={setPrefs} openSearch={() => openSearch("find")} />
       <div className="wm-main">
         <div className="wm-stage">
           {issues.length > 0 && (
@@ -777,10 +862,43 @@ export function App({ host }: { host: Host }) {
               onSize={onSize}
               spaceHeld={spaceHeld}
               api={canvasApi}
+              showBranches={prefs.showBranches}
+              showRelationships={prefs.showRelationships}
+              matches={found.ids}
+              currentMatch={found.current}
             />
           ) : (
             <Outline actions={actions} />
           )}
+          {laser && view === "map" && <Laser onExit={exitLaser} />}
+          {search && view === "map" && (
+            <SearchBar
+              doc={doc}
+              readOnly={readOnly}
+              mode={search.mode}
+              focusN={search.n}
+              setMode={(mode) => setSearch((s) => ({ mode, n: (s?.n ?? 0) + 1 }))}
+              onClose={closeSearch}
+              onJump={jumpTo}
+              onMatches={(ids, current) => setFound({ ids: new Set(ids), current })}
+              onReplace={replaceIn}
+            />
+          )}
+          {ctxMenu && view === "map" && (() => {
+            const tp = getTopic(doc, ctxMenu.id);
+            const kids = !!tp?.children?.length;
+            return (
+              <ContextMenu
+                x={ctxMenu.x}
+                y={ctxMenu.y}
+                onClose={closeCtxMenu}
+                items={[
+                  { icon: <Icon.expand />, label: t("expandSubtree"), disabled: readOnly || !kids, run: () => setSubtreeFold(ctxMenu.id, false) },
+                  { icon: <Icon.collapse />, label: t("collapseSubtree"), disabled: readOnly || !kids, run: () => setSubtreeFold(ctxMenu.id, true) },
+                ]}
+              />
+            );
+          })()}
           <textarea
             ref={captureRef}
             className={"wm-editor" + (editing ? " wm-editing" : "")}

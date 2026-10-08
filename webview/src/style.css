@@ -207,6 +207,18 @@
   user-select: none;
   -webkit-user-select: none;
 }
+.wm-laser {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+.wm-laser-on .wm-canvas,
+.wm-laser-on .wm-canvas * {
+  cursor: none !important;
+}
 .wm-canvas.wm-panning {
   cursor: grabbing;
 }
@@ -724,4 +736,232 @@ textarea.wm-input {
   border-radius: 8px;
   background: var(--wm-hover);
   font-size: 12px;
+}
+
+/* ---------- 设置菜单 ---------- */
+.wm-popover.wm-popover-right {
+  transform: translateX(calc(-100% + 44px));
+}
+.wm-settings {
+  display: flex;
+  flex-direction: column;
+  min-width: 260px;
+}
+.wm-settings-title {
+  padding: 6px 8px 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--wm-muted);
+}
+.wm-settings-title:not(:first-child) {
+  margin-top: 6px;
+  border-top: 1px solid var(--wm-border);
+  padding-top: 10px;
+}
+.wm-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+.wm-switch-row:hover {
+  background: var(--wm-hover);
+}
+.wm-switch {
+  position: relative;
+  width: 28px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--wm-input-border);
+  transition: background 0.15s;
+  flex-shrink: 0;
+}
+.wm-switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+.wm-switch.wm-on {
+  background: var(--wm-btn-bg);
+}
+.wm-switch.wm-on::after {
+  transform: translateX(12px);
+}
+.wm-card:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* ---------- 查找 / 替换 ---------- */
+.wm-search {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  z-index: 15;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 4px;
+  border: 1px solid var(--wm-border);
+  border-radius: 9px;
+  background: var(--wm-pop);
+  box-shadow: var(--wm-shadow);
+}
+.wm-search-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  align-self: stretch;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+}
+.wm-search-toggle:hover:not(:disabled) {
+  background: var(--wm-hover);
+}
+.wm-search-toggle:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.wm-search-toggle svg {
+  transition: transform 0.15s;
+}
+.wm-search-toggle.wm-open svg {
+  transform: rotate(90deg);
+}
+.wm-search-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.wm-search-row {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.wm-search-input {
+  display: flex;
+  align-items: center;
+  width: 220px;
+  height: 26px;
+  padding: 0 2px 0 8px;
+  border: 1px solid var(--wm-input-border);
+  border-radius: 6px;
+  background: var(--wm-input-bg);
+}
+.wm-search-input:focus-within {
+  border-color: var(--wm-accent);
+}
+.wm-search-input input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+.wm-search-case {
+  height: 20px;
+  padding: 0 4px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  font-size: 11px !important;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.wm-search-case:hover {
+  background: var(--wm-hover);
+}
+.wm-search-case.wm-active {
+  opacity: 1;
+  border-color: var(--wm-accent);
+  background: var(--wm-active);
+}
+.wm-search-count {
+  min-width: 52px;
+  padding: 0 6px;
+  font-size: 12px;
+  color: var(--wm-muted);
+  text-align: center;
+  white-space: nowrap;
+}
+.wm-search-count.wm-none {
+  color: #e5484d;
+}
+.wm-search-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+}
+.wm-search-text-btn {
+  height: 26px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.wm-search-btn:hover:not(:disabled),
+.wm-search-text-btn:hover:not(:disabled) {
+  background: var(--wm-hover);
+}
+.wm-search-btn:disabled,
+.wm-search-text-btn:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* ---------- 右键菜单 ---------- */
+.wm-ctx {
+  position: fixed;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+  padding: 4px;
+  border: 1px solid var(--wm-border);
+  border-radius: 8px;
+  background: var(--wm-pop);
+  box-shadow: var(--wm-shadow);
+}
+.wm-ctx button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.wm-ctx button:hover:not(:disabled) {
+  background: var(--wm-hover);
+}
+.wm-ctx button:disabled {
+  opacity: 0.4;
+  cursor: default;
 }

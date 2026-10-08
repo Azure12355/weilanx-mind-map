@@ -93,6 +93,14 @@ export const Icon = {
       <path d="M10.5 8C12 8 12 4 14 4M10.5 8C12 8 12 12 14 12M5.5 8C4 8 4 4 2 4M5.5 8C4 8 4 12 2 12" />
     </svg>
   ),
+  laser: () => (
+    <svg {...P}>
+      <path d="M2.5 13.5L8.5 7.5" />
+      <path d="M7 6L10 9" />
+      <circle cx="11.5" cy="4.5" r="1.6" fill="currentColor" stroke="none" />
+      <path d="M11.5 1V1.6M15 4.5H14.4M13.9 2.1L13.5 2.5M13.9 6.9L13.5 6.5" />
+    </svg>
+  ),
   panel: () => (
     <svg {...P}>
       <rect x="1.5" y="2.5" width="13" height="11" rx="2" />
@@ -150,6 +158,45 @@ export const Icon = {
   open: () => (
     <svg {...P}>
       <path d="M9 2.5H13.5V7M13.5 2.5L7.5 8.5M11.5 9.5V13.5H2.5V4.5H6.5" />
+    </svg>
+  ),
+  settings: () => (
+    <svg {...P}>
+      <circle cx="8" cy="8" r="2.2" />
+      <path d="M6.9 1.5H9.1L9.5 3.3L10.9 4.1L12.7 3.5L13.8 5.4L12.4 6.7V8.3L13.8 9.6L12.7 11.5L10.9 10.9L9.5 11.7L9.1 13.5H6.9L6.5 11.7L5.1 10.9L3.3 11.5L2.2 9.6L3.6 8.3V6.7L2.2 5.4L3.3 3.5L5.1 4.1L6.5 3.3Z" />
+    </svg>
+  ),
+  search: () => (
+    <svg {...P}>
+      <circle cx="7" cy="7" r="4.5" />
+      <path d="M10.4 10.4L14 14" />
+    </svg>
+  ),
+  up: () => (
+    <svg {...P}>
+      <path d="M4 10L8 6L12 10" />
+    </svg>
+  ),
+  down: () => (
+    <svg {...P}>
+      <path d="M4 6L8 10L12 6" />
+    </svg>
+  ),
+  right: () => (
+    <svg {...P}>
+      <path d="M6 4L10 8L6 12" />
+    </svg>
+  ),
+  expand: () => (
+    <svg {...P}>
+      <rect x="2" y="2" width="12" height="12" rx="2.5" />
+      <path d="M5 8H11M8 5V11" />
+    </svg>
+  ),
+  collapse: () => (
+    <svg {...P}>
+      <rect x="2" y="2" width="12" height="12" rx="2.5" />
+      <path d="M5 8H11" />
     </svg>
   ),
 };

@@ -13,6 +13,8 @@
   "command.zoomOut": "缩小",
   "command.fit": "适应画布",
   "command.export": "导出",
+  "command.find": "查找",
+  "command.replace": "替换",
   "configuration.title": "思维导图",
   "config.autoSave": "每次编辑后立即保存文件,保证 Agent 和其他工具读到的总是最新内容"
 }
