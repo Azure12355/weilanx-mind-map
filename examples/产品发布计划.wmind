@@ -1,9 +1,10 @@
 {
   "version": 1,
+  "structure": "logic",
   "root": {
     "id": "root01",
     "text": "产品发布计划",
-    "note": "Q4 新版本发布的整体规划,负责人:蔚蓝",
+    "note": "教程先发博客,再同步到公众号",
     "children": [
       {
         "id": "res001",
@@ -65,6 +66,9 @@
           {
             "id": "mvp003",
             "text": "JSON 存储格式",
+            "style": {
+              "shape": "underline"
+            },
             "markers": [
               "star-yellow"
             ]
@@ -72,6 +76,9 @@
           {
             "id": "mvp004",
             "text": "Agent 支持",
+            "style": {
+              "shape": "rounded"
+            },
             "children": [
               {
                 "id": "mvp005",
@@ -80,8 +87,16 @@
               {
                 "id": "mvp006",
                 "text": "SKILL.md"
+              },
+              {
+                "id": "7xxb1x",
+                "text": "Subtopic"
               }
             ]
+          },
+          {
+            "id": "8yykdn",
+            "text": "逻辑推理工程"
           }
         ]
       },
@@ -98,7 +113,10 @@
           },
           {
             "id": "qa0003",
-            "text": "无头浏览器冒烟测试"
+            "text": "无头浏览器冒烟测试",
+            "style": {
+              "shape": "capsule"
+            }
           }
         ]
       },
@@ -120,9 +138,33 @@
           },
           {
             "id": "rel004",
-            "text": "社群反馈收集"
+            "text": "社群反馈收集",
+            "style": {
+              "shape": "rounded"
+            },
+            "children": [
+              {
+                "id": "49mmr5",
+                "text": "确定的逻辑推演"
+              },
+              {
+                "id": "z2bhum",
+                "text": "Subtopic"
+              }
+            ]
           }
         ]
+      },
+      {
+        "id": "flt001",
+        "text": "风险:排期偏紧",
+        "style": {
+          "fill": "#FFE8A3"
+        }
+      },
+      {
+        "id": "6w7eou",
+        "text": "确定逻辑推理的成功"
       }
     ]
   },
@@ -131,20 +173,17 @@
       "id": "link01",
       "from": "res003",
       "to": "mvp003",
-      "text": "输入需求"
-    }
-  ],
-  "floating": [
-    {
-      "id": "flt001",
-      "text": "风险:排期偏紧",
-      "position": {
-        "x": 260,
-        "y": 250
-      },
-      "style": {
-        "fill": "#FFE8A3"
-      }
+      "text": "输入需求",
+      "controls": [
+        {
+          "x": 67.5,
+          "y": 33.2
+        },
+        {
+          "x": 237,
+          "y": -106
+        }
+      ]
     }
   ]
 }
