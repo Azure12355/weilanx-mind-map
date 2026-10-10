@@ -6,6 +6,17 @@ export const STRUCTURES: Structure[] = ["map", "logic", "org", "tree"];
 export type Shape = "rect" | "rounded" | "capsule" | "ellipse" | "underline" | "none";
 export const SHAPES: Shape[] = ["rect", "rounded", "capsule", "ellipse", "underline", "none"];
 
+/** 画法:标准几何线条 / Excalidraw 风格手绘 */
+export type Look = "standard" | "hand";
+export const LOOKS: Look[] = ["standard", "hand"];
+
+/** 手绘画法的填充样式(rough.js 的 fillStyle);none 表示只描边不填充 */
+export type FillStyle = "hachure" | "cross-hatch" | "solid" | "dots" | "dashed" | "zigzag" | "none";
+export const FILL_STYLES: FillStyle[] = ["hachure", "cross-hatch", "solid", "dots", "dashed", "zigzag", "none"];
+
+export type TextAlign = "left" | "center" | "right";
+export const TEXT_ALIGNS: TextAlign[] = ["left", "center", "right"];
+
 export type LineStyle = "curve" | "straight" | "elbow";
 export const LINE_STYLES: LineStyle[] = ["curve", "straight", "elbow"];
 
@@ -29,6 +40,10 @@ export interface Style {
   lineWidth?: number;
   /** 节点连向子节点的线;联系线另支持 dashed / solid */
   lineStyle?: LineStyle | "dashed" | "solid";
+  /** 手绘画法下的填充样式,覆盖文档默认值 */
+  fillStyle?: FillStyle;
+  /** 节点内容对齐,默认居中 */
+  textAlign?: TextAlign;
   [key: string]: unknown;
 }
 
@@ -75,6 +90,9 @@ export interface MindDoc {
   $schema?: string;
   version: number;
   theme?: string;
+  look?: Look;
+  /** 手绘画法下有底色节点的默认填充样式,默认 hachure */
+  fillStyle?: FillStyle;
   structure?: Structure;
   root: Topic;
   relationships?: Relationship[];
@@ -85,6 +103,8 @@ export interface MindDoc {
 export const FORMAT_VERSION = 1;
 export const DEFAULT_THEME = "classic";
 export const DEFAULT_STRUCTURE: Structure = "map";
+export const DEFAULT_LOOK: Look = "standard";
+export const DEFAULT_FILL_STYLE: FillStyle = "hachure";
 
 /** 解析 / 校验发现的问题 */
 export interface Issue {

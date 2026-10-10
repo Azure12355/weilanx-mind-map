@@ -3,6 +3,7 @@ import type { NodeBox } from "../../src/core/layout";
 import { markerDef } from "../../src/core/markers";
 import { SELECTION_COLOR, withAlpha, type ResolvedStyle } from "../../src/core/theme";
 import type { Shape } from "../../src/core/types";
+import { Rough } from "./rough";
 import { ICON_SIZE, LABEL_FONT_SIZE, LABEL_HEIGHT, type Content, type Metrics } from "./measure";
 
 export function shapePath(shape: Shape, w: number, h: number, root = false): string {
@@ -140,7 +141,26 @@ export const TopicNode = memo(function TopicNode({ box, style: s, m, content, se
       data-kind={box.kind === "summary" ? "summary" : "topic"}
       data-id={box.id}
     >
-      {s.shape === "underline" ? (
+      {s.hand ? (
+        <>
+          {/* 先铺一层画布底色:斜线之间是空的,不铺的话连线会从节点里穿过去 */}
+          {s.shape === "underline" || s.shape === "none" ? (
+            <rect x={0} y={0} width={w} height={h} fill="transparent" />
+          ) : (
+            <path d={shapePath(s.shape, w, h, s.kind === "root")} fill={background} />
+          )}
+          <Rough
+            id={box.id}
+            geo={{ t: "shape", shape: s.shape, w, h }}
+            style={{
+              stroke: hasBorder ? s.border : "none",
+              strokeWidth: hasBorder ? s.borderWidth : 2,
+              fill: s.shape === "underline" ? undefined : s.fill,
+              fillStyle: s.fillStyle === "none" ? undefined : s.fillStyle,
+            }}
+          />
+        </>
+      ) : s.shape === "underline" ? (
         <>
           <rect x={0} y={0} width={w} height={h} fill={fill} />
           {hasBorder && <line x1={0} y1={h} x2={w} y2={h} stroke={s.border} strokeWidth={s.borderWidth} strokeLinecap="round" />}
@@ -163,7 +183,13 @@ export const TopicNode = memo(function TopicNode({ box, style: s, m, content, se
         style={{ whiteSpace: "pre" }}
       >
         {m.lines.map((line, i) => (
-          <tspan key={i} x={m.textX + m.textW / 2} y={m.textY + i * m.lineHeight + m.lineHeight / 2} dy="0.35em" textAnchor="middle">
+          <tspan
+            key={i}
+            x={s.textAlign === "left" ? m.textX : s.textAlign === "right" ? m.textX + m.textW : m.textX + m.textW / 2}
+            y={m.textY + i * m.lineHeight + m.lineHeight / 2}
+            dy="0.35em"
+            textAnchor={s.textAlign === "left" ? "start" : s.textAlign === "right" ? "end" : "middle"}
+          >
             {line || " "}
           </tspan>
         ))}

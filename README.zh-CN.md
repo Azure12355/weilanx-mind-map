@@ -52,7 +52,9 @@ Weilanx Mind Map 是一款 **XMind 风格的思维导图插件**，在 **VS Code
 1. **XMind 的手感**：
 
 - 🌈 彩虹分支、由粗变细的主干曲线，子主题用扇形曲线连到下划线上
-- 🎨 6 套内置主题：经典、清新、商务、暗夜、手写、黑白，各自都有亮色和暗色两个版本，跟着编辑器自动切换
+- 🎨 6 套内置主题：经典、清新、商务、暗夜、Excalidraw、黑白，各自都有亮色和暗色两个版本，跟着编辑器自动切换
+- ✏️ 「标准 / 手绘」风格切换：任意主题都能切成 Excalidraw 手绘风格（抖动线条、Excalifont 与小赖手写字体），导出的图片也保持手绘效果。填充样式（斜线、交叉线、实心、点状、虚线、锯齿、不填充）可以整张图统一设置，也可以按主题单独设置
+- ↔️ 主题内容对齐：左对齐、居中（默认）、右对齐
 - 🧭 4 种结构：思维导图、逻辑图、组织结构图、树形图，既可以给整张图设，也可以只给某个分支设
 
 2. **编辑**：
@@ -196,7 +198,7 @@ Windows / Linux 上把 `⌘` 换成 `Ctrl`。
 - **只写非默认值**：不写 `style` 就表示跟随主题；`collapsed` 只在为 `true` 时出现。
 - **新节点可以不写 `id`**：插件打开时会自动补上。
 - **概括和外框用首尾子节点的 id 表示范围**：插入兄弟节点后范围不会错位。
-- **主题**：`classic` · `fresh` · `business` · `night` · `sketch` · `mono`。**结构**：`map` · `logic` · `org` · `tree`。
+- **主题**：`classic` · `fresh` · `business` · `night` · `sketch`（Excalidraw）· `mono`。**画法**：`standard` · `hand`。**结构**：`map` · `logic` · `org` · `tree`。
 
 完整字段说明见 [references/format.md](./skills/weilanx-mind-map/references/format.md)，JSON Schema 在 [schema/wmind.schema.json](./schema/wmind.schema.json)。在 VS Code 里点编辑器右上角的 **以 JSON 文本打开**，就能用 Schema 补全和校验来手改 JSON。
 

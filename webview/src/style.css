@@ -965,3 +965,33 @@ textarea.wm-input {
   opacity: 0.4;
   cursor: default;
 }
+
+.wm-settings-look {
+  padding: 2px 8px 4px;
+}
+.wm-look button {
+  font-size: 12px;
+  color: inherit;
+}
+.wm-look button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.wm-fills .wm-shape {
+  flex-direction: column;
+  gap: 2px;
+  height: auto;
+  padding: 5px 0 4px;
+  font-size: 11px;
+  color: inherit;
+}
+.wm-fills .wm-shape svg {
+  opacity: 0.85;
+}
+.wm-hint {
+  margin: 6px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--wm-muted);
+}

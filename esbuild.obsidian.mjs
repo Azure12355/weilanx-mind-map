@@ -38,7 +38,8 @@ const ctx = await esbuild.context({
   minify: !watch,
   sourcemap: watch ? "inline" : false,
   logLevel: "info",
-  loader: { ".css": "empty" },
+  // 手绘字体以 data URL 内联进 main.js
+  loader: { ".css": "empty", ".woff2": "dataurl" },
 });
 
 if (watch) {

@@ -5,7 +5,7 @@ import * as ops from "../src/core/ops";
 import { findByPath, findText, getTopic, indexDoc, outline, resolveRef, splitPath, topicPath } from "../src/core/query";
 import { fromMarkdown, markdownLosses, toMarkdown } from "../src/core/markdown";
 import { layout, NodeSize } from "../src/core/layout";
-import { resolveAll, contrastText } from "../src/core/theme";
+import { resolveAll, contrastText, luminance } from "../src/core/theme";
 import { MindDoc } from "../src/core/types";
 
 const SAMPLE: MindDoc = {
@@ -413,4 +413,75 @@ test("布局:同一范围的多个概括依次向外排开", () => {
   const a = r.nodes.get(s1.id)!;
   const b = r.nodes.get(s2.id)!;
   assert.ok(b.x >= a.x + a.w);
+});
+
+// ---------- 画法 ----------
+
+test("画法 look:默认 standard 省略,hand 写出;未知值告警", () => {
+  const d = doc();
+  assert.doesNotMatch(serialize(ops.setDocProp(d, "look", "standard")), /"look"/);
+  const s = serialize(ops.setDocProp(d, "look", "hand"));
+  assert.match(s, /"version": 1,\n  "look": "hand",/);
+  assert.equal(parse(s).doc!.look, "hand");
+  const bad = parse(JSON.stringify({ ...d, look: "crayon" }));
+  assert.ok(bad.issues.some((i) => i.message.includes("crayon")));
+});
+
+test("画法 hand:斜线填充的节点文字改用主题文字色,补描边,换手写字体,不默认加粗", () => {
+  const std = resolveAll(doc(), false);
+  const hand = resolveAll({ ...doc(), look: "hand" }, false);
+  assert.equal(hand.look, "hand");
+  const root = hand.styles.get("root01")!;
+  assert.equal(std.styles.get("root01")!.textColor, "#FFFFFF");
+  assert.equal(root.textColor, hand.palette.text);
+  // 描边用原底色,斜线换成同色系浅色
+  assert.equal(root.border, std.styles.get("root01")!.fill);
+  assert.notEqual(root.fill, root.border);
+  assert.ok(luminance(root.fill) > 0.5);
+  assert.equal(root.borderWidth, 2);
+  assert.equal(root.bold, false);
+  assert.equal(root.hand, true);
+  assert.match(root.fontFamily, /WM Excalifont/);
+  assert.equal(std.styles.get("root01")!.hand, false);
+  // 用户显式设置的文字色和粗体优先
+  const own = ops.updateTopic({ ...doc(), look: "hand" }, "b00001", { style: { textColor: "#123456", bold: true } });
+  const b = resolveAll(own, false).styles.get("b00001")!;
+  assert.equal(b.textColor, "#123456");
+  assert.equal(b.bold, true);
+});
+
+test("Excalidraw 主题:主分支用 Excalidraw 调色板,填充为同色系浅色", () => {
+  const r = resolveAll({ ...doc(), theme: "sketch" }, false);
+  const a = r.styles.get("a00001")!;
+  assert.equal(r.palette.background, "#ffffff");
+  assert.equal(a.border, "#e03131");
+  assert.equal(a.fill, "#ffc9c9");
+});
+
+test("填充样式:文档默认值 + 节点覆盖;none 只描边,solid 保留原色并按底色选字色", () => {
+  const d = { ...doc(), look: "hand" as const, fillStyle: "dots" as const };
+  assert.match(serialize(d), /"fillStyle": "dots"/);
+  assert.doesNotMatch(serialize({ ...d, fillStyle: "hachure" }), /"fillStyle"/);
+  let r = resolveAll(d, false).styles;
+  assert.equal(r.get("a00001")!.fillStyle, "dots");
+  const std = resolveAll(doc(), false).styles;
+  const own = ops.setStyle(ops.setStyle(d, "root01", { fillStyle: "none" }), "a00001", { fillStyle: "solid" });
+  r = resolveAll(own, false).styles;
+  const root = r.get("root01")!;
+  assert.equal(root.fill, "none");
+  assert.equal(root.border, std.get("root01")!.fill, "不填充时保留原底色描边");
+  const a = r.get("a00001")!;
+  assert.equal(a.fill, std.get("a00001")!.fill);
+  assert.equal(a.textColor, std.get("a00001")!.textColor);
+  // 标准画法下 fillStyle 不生效
+  assert.equal(resolveAll({ ...own, look: "standard" }, false).styles.get("root01")!.fill, std.get("root01")!.fill);
+});
+
+test("内容对齐:默认居中,节点可设 left / right,非法值告警", () => {
+  const d = ops.setStyle(doc(), "a00001", { textAlign: "left" });
+  assert.equal(resolveAll(d, false).styles.get("a00001")!.textAlign, "left");
+  assert.equal(resolveAll(d, false).styles.get("b00001")!.textAlign, "center");
+  assert.match(serialize(d), /"textAlign": "left"/);
+  const bad = ops.setStyle(doc(), "a00001", { textAlign: "justify" as never });
+  assert.ok(validate(bad).some((i) => i.message.includes("textAlign")));
 });

@@ -91,10 +91,15 @@ var ALL_MARKER_IDS = [...BY_ID.keys()];
 // src/core/types.ts
 var STRUCTURES = ["map", "logic", "org", "tree"];
 var SHAPES = ["rect", "rounded", "capsule", "ellipse", "underline", "none"];
+var LOOKS = ["standard", "hand"];
+var FILL_STYLES = ["hachure", "cross-hatch", "solid", "dots", "dashed", "zigzag", "none"];
+var TEXT_ALIGNS = ["left", "center", "right"];
 var LINE_STYLES = ["curve", "straight", "elbow"];
 var FORMAT_VERSION = 1;
 var DEFAULT_THEME = "classic";
 var DEFAULT_STRUCTURE = "map";
+var DEFAULT_LOOK = "standard";
+var DEFAULT_FILL_STYLE = "hachure";
 
 // src/core/doc.ts
 function newDoc(rootText = "\u4E2D\u5FC3\u4E3B\u9898") {
@@ -170,6 +175,12 @@ function normalizeDoc(raw, ctx) {
   if (raw.theme !== void 0 && typeof raw.theme !== "string") {
     delete out.theme;
     ctx.changed = true;
+  }
+  if (raw.look !== void 0 && !LOOKS.includes(raw.look)) {
+    ctx.issues.push({ level: "warn", message: `\u672A\u77E5\u753B\u6CD5\u300C${String(raw.look)}\u300D,\u6309 ${DEFAULT_LOOK} \u663E\u793A` });
+  }
+  if (raw.fillStyle !== void 0 && !FILL_STYLES.includes(raw.fillStyle)) {
+    ctx.issues.push({ level: "warn", message: `\u672A\u77E5\u586B\u5145\u6837\u5F0F\u300C${String(raw.fillStyle)}\u300D,\u6309 ${DEFAULT_FILL_STYLE} \u663E\u793A` });
   }
   if (raw.structure !== void 0 && !STRUCTURES.includes(raw.structure)) {
     ctx.issues.push({ level: "warn", message: `\u672A\u77E5\u7ED3\u6784\u300C${String(raw.structure)}\u300D,\u6309 ${DEFAULT_STRUCTURE} \u663E\u793A` });
@@ -315,6 +326,10 @@ function styleValueOk(key, v, forRelationship = false) {
       return typeof v === "boolean";
     case "lineStyle":
       return LINE_STYLES.includes(v) || forRelationship && (v === "dashed" || v === "solid");
+    case "fillStyle":
+      return FILL_STYLES.includes(v);
+    case "textAlign":
+      return TEXT_ALIGNS.includes(v);
     default:
       return true;
   }
@@ -359,10 +374,10 @@ function short(s) {
   const one2 = s.replace(/\n/g, " ");
   return one2.length > 20 ? one2.slice(0, 20) + "\u2026" : one2;
 }
-var DOC_KEYS = ["$schema", "version", "theme", "structure", "root", "relationships", "floating"];
+var DOC_KEYS = ["$schema", "version", "theme", "look", "fillStyle", "structure", "root", "relationships", "floating"];
 var TOPIC_KEYS = ["id", "text", "collapsed", "structure", "position", "style", "markers", "labels", "note", "link", "summaries", "boundaries", "children"];
 var REF_KEYS = ["id", "from", "to", "text", "controls", "style"];
-var STYLE_KEYS = ["shape", "fill", "border", "borderWidth", "textColor", "fontSize", "bold", "italic", "strike", "lineColor", "lineWidth", "lineStyle"];
+var STYLE_KEYS = ["shape", "fill", "border", "borderWidth", "textColor", "fontSize", "bold", "italic", "strike", "lineColor", "lineWidth", "lineStyle", "fillStyle", "textAlign"];
 function isEmpty(v) {
   if (v === void 0 || v === null) return true;
   if (Array.isArray(v)) return v.length === 0;
@@ -420,6 +435,10 @@ function serialize(doc) {
         return typeof v === "number" ? v : FORMAT_VERSION;
       case "theme":
         return v === DEFAULT_THEME || isEmpty(v) ? void 0 : v;
+      case "look":
+        return v === DEFAULT_LOOK || isEmpty(v) ? void 0 : v;
+      case "fillStyle":
+        return v === DEFAULT_FILL_STYLE || isEmpty(v) ? void 0 : v;
       case "structure":
         return v === DEFAULT_STRUCTURE || isEmpty(v) ? void 0 : v;
       case "root":
@@ -1011,8 +1030,9 @@ var CLASSIC_RAINBOW = ["#F0604D", "#F5A623", "#3DB47A", "#2F9BEA", "#7C63F2", "#
 var FRESH_RAINBOW = ["#3FB68E", "#4BAEE3", "#F0B43C", "#EE8070", "#9A86E8", "#4EC0C8"];
 var BUSINESS_RAINBOW = ["#1F5FAD", "#2E7DD1", "#1E8C9E", "#4A6FA5", "#2C6E8F", "#5B7DB8"];
 var NIGHT_RAINBOW = ["#FF5C8A", "#FFB547", "#3DDC97", "#38BDF8", "#A78BFA", "#F472B6"];
-var SKETCH_RAINBOW = ["#E4572E", "#E99A0F", "#2E9E4F", "#2E86AB", "#A23B72", "#6C4AB6"];
-var HAND = `"Comic Sans MS", "Chalkboard SE", "Kaiti SC", "STKaiti", "KaiTi", cursive`;
+var EXCALI_RAINBOW = ["#e03131", "#1971c2", "#2f9e44", "#f08c00", "#6741d9", "#0c8599", "#c2255c", "#099268"];
+var EXCALI_RAINBOW_DARK = ["#ff8787", "#74c0fc", "#8ce99a", "#ffd43b", "#b197fc", "#66d9e8", "#f783ac", "#63e6be"];
+var HAND_FONT = `"WM Excalifont", "WM Xiaolai", ${SANS}`;
 var THEMES = [
   {
     id: "classic",
@@ -1105,27 +1125,25 @@ var THEMES = [
   },
   {
     id: "sketch",
-    zh: "\u624B\u5199",
-    en: "Sketch",
+    zh: "Excalidraw",
+    en: "Excalidraw",
     light: palette({
-      background: "#FFFDF5",
-      text: "#2A2A2A",
-      rainbow: SKETCH_RAINBOW,
-      fontFamily: HAND,
-      relationship: "#7A7266",
-      root: lv(ROOT, { fill: "#FFE08A", border: "#2A2A2A", borderWidth: 2, textColor: "#2A2A2A" }),
-      main: lv(MAIN, { fill: "none", border: "branch", borderWidth: 2, textColor: "#2A2A2A" }),
-      floating: lv(FLOAT, { fill: "#FFF3C4", border: "#2A2A2A", borderWidth: 1.5 })
+      background: "#ffffff",
+      text: "#1e1e1e",
+      rainbow: EXCALI_RAINBOW,
+      relationship: "#1e1e1e",
+      root: lv(ROOT, { fill: "#ffec99", border: "#1e1e1e", borderWidth: 2, textColor: "#1e1e1e" }),
+      main: lv(MAIN, { fill: "tint", border: "branch", borderWidth: 2, textColor: "#1e1e1e" }),
+      floating: lv(FLOAT, { fill: "#e9ecef", border: "#1e1e1e", borderWidth: 2, textColor: "#1e1e1e" })
     }),
     dark: palette({
-      background: "#24221E",
-      text: "#EDE6D6",
-      rainbow: SKETCH_RAINBOW,
-      fontFamily: HAND,
-      relationship: "#A39A8A",
-      root: lv(ROOT, { fill: "#5C4A1A", border: "#EDE6D6", borderWidth: 2, textColor: "#FFF4D6" }),
-      main: lv(MAIN, { fill: "none", border: "branch", borderWidth: 2, textColor: "#EDE6D6" }),
-      floating: lv(FLOAT, { fill: "#3A352C", border: "#EDE6D6", borderWidth: 1.5 })
+      background: "#121212",
+      text: "#e9ecef",
+      rainbow: EXCALI_RAINBOW_DARK,
+      relationship: "#ced4da",
+      root: lv(ROOT, { fill: "#5c4a12", border: "#e9ecef", borderWidth: 2, textColor: "#e9ecef" }),
+      main: lv(MAIN, { fill: "tint", border: "branch", borderWidth: 2, textColor: "#e9ecef" }),
+      floating: lv(FLOAT, { fill: "#2b2b2b", border: "#ced4da", borderWidth: 2, textColor: "#e9ecef" })
     })
   },
   {
@@ -1177,10 +1195,10 @@ var HELP = `wm \u2014 \u8BFB\u5199 .wmind \u601D\u7EF4\u5BFC\u56FE(\u7EAF JSON)
   wm rel      <file> <from-ref> <to-ref> [--text T]     \u6DFB\u52A0\u8054\u7CFB\u7EBF
   wm summary  <file> <ref>... [--text T]                \u7ED9\u540C\u4E00\u7236\u8282\u70B9\u4E0B\u7684\u51E0\u4E2A\u5144\u5F1F\u52A0\u6982\u62EC
   wm boundary <file> <ref>... [--text T]                \u7ED9\u540C\u4E00\u7236\u8282\u70B9\u4E0B\u7684\u51E0\u4E2A\u5144\u5F1F\u52A0\u5916\u6846
-  wm doc      <file> [--theme \u540D\u79F0] [--structure map|logic|org|tree]
+  wm doc      <file> [--theme \u540D\u79F0] [--look standard|hand] [--fill hachure|cross-hatch|solid|dots|dashed|zigzag|none] [--structure map|logic|org|tree]
   wm from-md  <md \u6587\u4EF6> -o <file> [--title \u4E2D\u5FC3\u4E3B\u9898]    Markdown \u5927\u7EB2 \u2192 \u5BFC\u56FE
 
-\u6837\u5F0F\u952E:shape fill border borderWidth textColor fontSize bold italic strike lineColor lineWidth lineStyle
+\u6837\u5F0F\u952E:shape fill border borderWidth textColor fontSize bold italic strike lineColor lineWidth lineStyle fillStyle textAlign
 \u4E3B\u9898:${THEMES.map((t) => t.id).join(" ")}
 \u6807\u8BB0:priority-1..9  task-0/25/50/75/100  flag-<\u8272>  star-<\u8272>  smiley-happy/laugh/sad/angry/surprised
       symbol-question/exclamation/check/cross/idea   (\u8272:red orange yellow green blue purple)`;
@@ -1354,6 +1372,11 @@ function run(argv) {
       if (link !== void 0) doc = updateTopic(doc, t.id, { link: link || void 0 });
       const col = one(a, "collapsed");
       if (col !== void 0) doc = setCollapsed(doc, t.id, col === "true");
+      const look = one(a, "look");
+      if (look !== void 0) {
+        if (!LOOKS.includes(look)) throw new UsageError(`\u672A\u77E5\u753B\u6CD5:${look}`);
+        doc = setDocProp(doc, "look", look);
+      }
       const st = one(a, "structure");
       if (st !== void 0) {
         if (st && !STRUCTURES.includes(st)) throw new UsageError(`\u672A\u77E5\u7ED3\u6784:${st}`);
@@ -1428,6 +1451,16 @@ function run(argv) {
       if (theme !== void 0) {
         if (!THEMES.some((t) => t.id === theme)) throw new UsageError(`\u672A\u77E5\u4E3B\u9898:${theme}`);
         doc = setDocProp(doc, "theme", theme);
+      }
+      const look = one(a, "look");
+      if (look !== void 0) {
+        if (!LOOKS.includes(look)) throw new UsageError(`\u672A\u77E5\u753B\u6CD5:${look}`);
+        doc = setDocProp(doc, "look", look);
+      }
+      const fill = one(a, "fill");
+      if (fill !== void 0) {
+        if (!FILL_STYLES.includes(fill)) throw new UsageError(`\u672A\u77E5\u586B\u5145\u6837\u5F0F:${fill}`);
+        doc = setDocProp(doc, "fillStyle", fill);
       }
       const st = one(a, "structure");
       if (st !== void 0) {

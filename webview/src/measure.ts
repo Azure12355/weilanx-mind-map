@@ -83,8 +83,14 @@ export function wrap(font: string, text: string, max: number): string[] {
 
 const cache = new WeakMap<object, { key: string; m: Metrics }>();
 
+/** 字体加载完成后加一,让缓存的尺寸失效重新测量 */
+let fontEpoch = 0;
+export function bumpFontEpoch(): void {
+  fontEpoch++;
+}
+
 export function measure(owner: object, c: Content, s: ResolvedStyle, placeholder: string): Metrics {
-  const key = [c.text, s.fontSize, s.bold, s.italic, s.fontFamily, s.shape, s.padX, s.padY, s.borderWidth, (c.markers ?? []).length, (c.labels ?? []).join("\u0001"), !!c.note, !!c.link].join("|");
+  const key = [fontEpoch, s.textAlign, c.text, s.fontSize, s.bold, s.italic, s.fontFamily, s.shape, s.padX, s.padY, s.borderWidth, (c.markers ?? []).length, (c.labels ?? []).join("\u0001"), !!c.note, !!c.link].join("|");
   const hit = cache.get(owner);
   if (hit && hit.key === key) return hit.m;
   const m = compute(c, s, placeholder);
@@ -129,7 +135,9 @@ function compute(c: Content, s: ResolvedStyle, placeholder: string): Metrics {
   w = Math.ceil(Math.max(w, s.kind === "root" ? 80 : 24));
   h = Math.ceil(h);
 
-  const rowX = padX + (contentW - rowW) / 2;
+  // 对齐:标记 + 文字 + 图标这一行、标签行在内容区里靠左 / 居中 / 靠右
+  const place = (inner: number) => padX + (s.textAlign === "left" ? 0 : s.textAlign === "right" ? contentW - inner : (contentW - inner) / 2);
+  const rowX = place(rowW);
   const rowY = padY;
   return {
     w,
@@ -146,7 +154,7 @@ function compute(c: Content, s: ResolvedStyle, placeholder: string): Metrics {
     markersY: rowY + (rowH - markerSize) / 2,
     iconsX: rowX + markersW + textW + GAP,
     iconsY: rowY + (rowH - ICON) / 2,
-    labelsX: padX + (contentW - labelsW) / 2,
+    labelsX: place(labelsW),
     labelsY: rowY + rowH + 5,
     labelWidths,
   };

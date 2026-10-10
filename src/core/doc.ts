@@ -2,17 +2,24 @@
 import { genId } from "./id";
 import { markerDef } from "./markers";
 import {
+  DEFAULT_FILL_STYLE,
+  DEFAULT_LOOK,
   DEFAULT_STRUCTURE,
   DEFAULT_THEME,
   FORMAT_VERSION,
+  FILL_STYLES,
+  FillStyle,
   Issue,
   LINE_STYLES,
+  Look,
+  LOOKS,
   MindDoc,
   Range,
   Relationship,
   SHAPES,
   STRUCTURES,
   Style,
+  TEXT_ALIGNS,
   Topic,
 } from "./types";
 
@@ -128,6 +135,12 @@ function normalizeDoc(raw: Record<string, unknown>, ctx: NormState): MindDoc {
   if (raw.theme !== undefined && typeof raw.theme !== "string") {
     delete out.theme;
     ctx.changed = true;
+  }
+  if (raw.look !== undefined && !LOOKS.includes(raw.look as never)) {
+    ctx.issues.push({ level: "warn", message: `未知画法「${String(raw.look)}」,按 ${DEFAULT_LOOK} 显示` });
+  }
+  if (raw.fillStyle !== undefined && !FILL_STYLES.includes(raw.fillStyle as never)) {
+    ctx.issues.push({ level: "warn", message: `未知填充样式「${String(raw.fillStyle)}」,按 ${DEFAULT_FILL_STYLE} 显示` });
   }
   if (raw.structure !== undefined && !STRUCTURES.includes(raw.structure as never)) {
     ctx.issues.push({ level: "warn", message: `未知结构「${String(raw.structure)}」,按 ${DEFAULT_STRUCTURE} 显示` });
@@ -282,6 +295,10 @@ export function styleValueOk(key: string, v: unknown, forRelationship = false): 
       return typeof v === "boolean";
     case "lineStyle":
       return LINE_STYLES.includes(v as never) || (forRelationship && (v === "dashed" || v === "solid"));
+    case "fillStyle":
+      return FILL_STYLES.includes(v as never);
+    case "textAlign":
+      return TEXT_ALIGNS.includes(v as never);
     default:
       return true; // 未知键原样保留,不算错
   }
@@ -340,10 +357,10 @@ function short(s: string): string {
 
 // ---------- 序列化 ----------
 
-const DOC_KEYS = ["$schema", "version", "theme", "structure", "root", "relationships", "floating"];
+const DOC_KEYS = ["$schema", "version", "theme", "look", "fillStyle", "structure", "root", "relationships", "floating"];
 const TOPIC_KEYS = ["id", "text", "collapsed", "structure", "position", "style", "markers", "labels", "note", "link", "summaries", "boundaries", "children"];
 const REF_KEYS = ["id", "from", "to", "text", "controls", "style"];
-const STYLE_KEYS = ["shape", "fill", "border", "borderWidth", "textColor", "fontSize", "bold", "italic", "strike", "lineColor", "lineWidth", "lineStyle"];
+const STYLE_KEYS = ["shape", "fill", "border", "borderWidth", "textColor", "fontSize", "bold", "italic", "strike", "lineColor", "lineWidth", "lineStyle", "fillStyle", "textAlign"];
 
 function isEmpty(v: unknown): boolean {
   if (v === undefined || v === null) return true;
@@ -408,6 +425,10 @@ export function serialize(doc: MindDoc): string {
         return typeof v === "number" ? v : FORMAT_VERSION;
       case "theme":
         return v === DEFAULT_THEME || isEmpty(v) ? undefined : v;
+      case "look":
+        return v === DEFAULT_LOOK || isEmpty(v) ? undefined : v;
+      case "fillStyle":
+        return v === DEFAULT_FILL_STYLE || isEmpty(v) ? undefined : v;
       case "structure":
         return v === DEFAULT_STRUCTURE || isEmpty(v) ? undefined : v;
       case "root":
@@ -430,4 +451,12 @@ export function serialize(doc: MindDoc): string {
 
 export function docTheme(doc: MindDoc): string {
   return typeof doc.theme === "string" && doc.theme ? doc.theme : DEFAULT_THEME;
+}
+
+export function docFillStyle(doc: MindDoc): FillStyle {
+  return FILL_STYLES.includes(doc.fillStyle as FillStyle) ? (doc.fillStyle as FillStyle) : DEFAULT_FILL_STYLE;
+}
+
+export function docLook(doc: MindDoc): Look {
+  return LOOKS.includes(doc.look as Look) ? (doc.look as Look) : DEFAULT_LOOK;
 }

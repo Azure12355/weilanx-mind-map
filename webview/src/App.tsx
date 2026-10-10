@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react";
-import { parse, serialize, type ParseError } from "../../src/core/doc";
+import { docLook, parse, serialize, type ParseError } from "../../src/core/doc";
 import * as ops from "../../src/core/ops";
 import { OpError } from "../../src/core/ops";
 import { getTopic, indexDoc } from "../../src/core/query";
@@ -17,6 +17,8 @@ import { ContextMenu } from "./ContextMenu";
 import { FormatPanel } from "./FormatPanel";
 import { Outline } from "./Outline";
 import { buildSvg, svgToPngBase64 } from "./export";
+import { handFontCss, loadHandFonts } from "./handFonts";
+import { bumpFontEpoch } from "./measure";
 import { setLang, t } from "./i18n";
 import { Icon } from "./icons";
 
@@ -142,7 +144,33 @@ export function App({ host }: { host: Host }) {
     setEditingState(e);
   };
 
-  const scene = useMemo(() => (doc ? buildScene(doc, dark) : null), [doc, dark]);
+  // 手绘字体:文档里出现新字符时加载对应分片,加载完重新排版
+  const hand = !!doc && docLook(doc) === "hand";
+  const [fontTick, setFontTick] = useState(0);
+  const [fontsPending, setFontsPending] = useState(false);
+  const fontsSeen = useRef(false);
+  useEffect(() => {
+    if (!doc || !hand) return;
+    let live = true;
+    const chars = [...new Set(JSON.stringify(doc) + t("emptyText") + t("newSummary"))].join("");
+    if (!fontsSeen.current) setFontsPending(true);
+    const timer = window.setTimeout(() => live && setFontsPending(false), 1500);
+    loadHandFonts(chars).then((changed) => {
+      // 即使文档已经变了,新分片也已加载,照样要让排版失效
+      if (changed) {
+        bumpFontEpoch();
+        setFontTick((n) => n + 1);
+      }
+      fontsSeen.current = true;
+      if (live) setFontsPending(false);
+    });
+    return () => {
+      live = false;
+      window.clearTimeout(timer);
+    };
+  }, [doc, hand]);
+
+  const scene = useMemo(() => (doc ? buildScene(doc, dark) : null), [doc, dark, fontTick]);
   const sceneRef = useRef(scene);
   sceneRef.current = scene;
 
@@ -473,7 +501,8 @@ export function App({ host }: { host: Host }) {
     await new Promise((r) => requestAnimationFrame(() => r(null)));
     const world = rootRef.current?.querySelector(".wm-world") as SVGGElement | null;
     if (!world) return;
-    const { svg, w, h } = buildSvg(world, s.palette.background);
+    const fontCss = s.look === "hand" ? await handFontCss(world.textContent ?? "") : "";
+    const { svg, w, h } = buildSvg(world, s.palette.background, fontCss);
     if (format === "svg") host.post({ type: "export", format, data: svg, encoding: "utf8", defaultName: `${name}.svg` });
     else host.post({ type: "export", format, data: await svgToPngBase64(svg, w, h, 2), encoding: "base64", defaultName: `${name}.png` });
   };
@@ -795,6 +824,7 @@ export function App({ host }: { host: Host }) {
         fontWeight: st.bold ? 600 : 400,
         fontStyle: st.italic ? "italic" : undefined,
         lineHeight: 1.4,
+        textAlign: st.textAlign,
         padding: `${st.padY * v.k}px ${st.padX * v.k}px`,
         color: st.fill === "none" ? st.textColor : st.textColor,
         background: st.fill === "none" ? scene.palette.background : st.fill,
@@ -866,6 +896,7 @@ export function App({ host }: { host: Host }) {
               showRelationships={prefs.showRelationships}
               matches={found.ids}
               currentMatch={found.current}
+              pending={hand && fontsPending}
             />
           ) : (
             <Outline actions={actions} />

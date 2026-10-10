@@ -495,7 +495,7 @@ export function removeRange(doc: MindDoc, id: string): MindDoc {
 
 // ---------- 文档级 ----------
 
-export function setDocProp(doc: MindDoc, key: "theme" | "structure", value: string | undefined): MindDoc {
+export function setDocProp(doc: MindDoc, key: "theme" | "look" | "fillStyle" | "structure", value: string | undefined): MindDoc {
   const out = { ...doc } as MindDoc;
   if (value === undefined) delete out[key];
   else (out as Record<string, unknown>)[key] = value;

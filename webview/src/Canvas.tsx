@@ -7,6 +7,7 @@ import { cleanStyle } from "../../src/core/doc";
 import { SELECTION_COLOR, withAlpha } from "../../src/core/theme";
 import type { Scene } from "./scene";
 import { TopicNode } from "./TopicNode";
+import { Rough } from "./rough";
 
 export interface Viewport {
   x: number;
@@ -52,6 +53,8 @@ interface Props {
   /** 查找命中的主题与当前项 */
   matches: Set<string>;
   currentMatch: string | null;
+  /** 手绘字体首次加载中:先不显示图形,避免按回退字体排版后再跳动 */
+  pending?: boolean;
 }
 
 type Drag =
@@ -60,7 +63,7 @@ type Drag =
   | { mode: "node"; ids: string[]; sx: number; sy: number; dx: number; dy: number; moved: boolean; drop: DropTarget | null; grab: Point; clickId: string; plain: boolean }
   | { mode: "handle"; relId: string; which: 0 | 1; controls: [Point, Point] };
 
-export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport, setViewport, onSize, spaceHeld, api, showBranches, showRelationships, matches, currentMatch }: Props) {
+export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport, setViewport, onSize, spaceHeld, api, showBranches, showRelationships, matches, currentMatch, pending }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<Drag | null>(null);
   const dragRef = useRef<Drag | null>(null);
@@ -74,6 +77,7 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
 
   const L = scene.layout;
   const P = scene.palette;
+  const hand = scene.look === "hand";
   const sel = useMemo(() => new Set(selection), [selection]);
 
   useLayoutEffect(() => {
@@ -375,6 +379,14 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
     // 中心主题连出的线用各分支自己的颜色
     const color = ps.kind === "root" ? cs.branchColor : ps.lineColor;
     const dim = dragging.has(e.to);
+    // 手绘:锥形粗线改成加粗的抖动曲线,其余线条直接抖动
+    if (hand) {
+      const style = e.orient === "v" && ps.lineStyle === "curve" ? "elbow" : ps.lineStyle;
+      const pb = L.nodes.get(e.from);
+      const inset = e.orient === "h" && !e.fromRoot && ps.shape === "underline" && pb ? Math.min(24, pb.w * 0.3) : 0;
+      const width = e.fromRoot && ps.lineStyle === "curve" ? Math.max(2.5, ps.lineWidth) : ps.lineWidth;
+      return <Rough key={e.to} id={"e-" + e.to} geo={{ t: "path", d: edgePath(e, style, inset), size: Math.hypot(e.x2 - e.x1, e.y2 - e.y1) }} style={{ stroke: color, strokeWidth: width }} opacity={dim ? 0.3 : 1} />;
+    }
     if (e.fromRoot && ps.lineStyle === "curve") {
       return <path key={e.to} d={taperPath(e, ps.lineWidth * 2.2, Math.max(1.5, ps.lineWidth * 0.6))} fill={color} opacity={dim ? 0.3 : 1} />;
     }
@@ -397,8 +409,23 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
     const label = r.range.text;
     return (
       <g key={g.id} data-kind="boundary" data-id={g.id}>
-        <rect x={g.x} y={g.y} width={g.w} height={g.h} rx={10} fill={fill === "none" ? "transparent" : fill} stroke={color} strokeWidth={1.5} strokeDasharray="6 4" />
-        {label && (
+        {hand ? (
+          <g transform={`translate(${g.x},${g.y})`}>
+            <rect width={g.w} height={g.h} fill={fill === "none" ? "transparent" : fill} />
+            <Rough id={g.id} geo={{ t: "shape", shape: "rounded", w: g.w, h: g.h }} style={{ stroke: color, strokeWidth: 1.5, dashed: true }} />
+          </g>
+        ) : (
+          <rect x={g.x} y={g.y} width={g.w} height={g.h} rx={10} fill={fill === "none" ? "transparent" : fill} stroke={color} strokeWidth={1.5} strokeDasharray="6 4" />
+        )}
+        {label && hand && (
+          <g transform={`translate(${g.x},${g.y})`}>
+            <Rough id={g.id + "-label"} geo={{ t: "shape", shape: "rounded", w: Math.min(g.w, label.length * 13 + 20), h: 22 }} style={{ stroke: color, strokeWidth: 1.5, fill: color, fillStyle: "solid" }} />
+            <text x={10} y={11} dy="0.35em" fontSize={12} fill="#fff" fontFamily={P.fontFamily}>
+              {label}
+            </text>
+          </g>
+        )}
+        {label && !hand && (
           <g>
             <rect x={g.x} y={g.y} width={Math.min(g.w, label.length * 13 + 20)} height={20} rx={10} fill={color} />
             <text x={g.x + 10} y={g.y + 10} dy="0.35em" fontSize={12} fill="#fff" fontFamily={P.fontFamily} fontWeight={500}>
@@ -413,6 +440,10 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
 
   const summaries = L.summaries.map((g) => {
     const st = scene.styles.get(g.id);
+    if (hand) {
+      const stroke = st && st.border !== "none" ? st.border : (st?.branchColor ?? P.relationship);
+      return <Rough key={g.id} id={g.id + "-bracket"} geo={{ t: "path", d: bracketPath(g), size: 60 }} style={{ stroke, strokeWidth: 1.6 }} />;
+    }
     return <path key={g.id} d={bracketPath(g)} fill="none" stroke={st?.border !== "none" ? st?.border : st.branchColor} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />;
   });
 
@@ -432,8 +463,29 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
     return (
       <g key={r.id} data-kind="rel" data-id={r.id}>
         <path d={g.d} fill="none" stroke="transparent" strokeWidth={14} />
-        <path d={g.d} fill="none" stroke={selected ? SELECTION_COLOR : color} strokeWidth={width} strokeDasharray={dashed ? "6 5" : undefined} strokeLinecap="round" />
-        <path d={arrow} fill={selected ? SELECTION_COLOR : color} />
+        {hand ? (
+          <>
+            <Rough id={r.id} geo={{ t: "path", d: g.d, size: Math.hypot(g.end.x - g.start.x, g.end.y - g.start.y) }} style={{ stroke: selected ? SELECTION_COLOR : color, strokeWidth: width, dashed }} />
+            {/* Excalidraw 的箭头是两条短线 */}
+            {[-1, 1].map((sgn) => {
+              const a = g.angle + sgn * 0.44;
+              const al = 10 + width * 3;
+              return (
+                <Rough
+                  key={sgn}
+                  id={`${r.id}-a${sgn}`}
+                  geo={{ t: "line", x1: g.end.x - al * Math.cos(a), y1: g.end.y - al * Math.sin(a), x2: g.end.x, y2: g.end.y }}
+                  style={{ stroke: selected ? SELECTION_COLOR : color, strokeWidth: width, maxRoughness: 1 }}
+                />
+              );
+            })}
+          </>
+        ) : (
+          <>
+            <path d={g.d} fill="none" stroke={selected ? SELECTION_COLOR : color} strokeWidth={width} strokeDasharray={dashed ? "6 5" : undefined} strokeLinecap="round" />
+            <path d={arrow} fill={selected ? SELECTION_COLOR : color} />
+          </>
+        )}
         {r.text && (
           <g>
             <rect x={g.mid.x - (r.text.length * 13 + 16) / 2} y={g.mid.y - 11} width={r.text.length * 13 + 16} height={22} rx={6} fill={P.background} />
@@ -503,7 +555,7 @@ export function Canvas({ doc, scene, selection, linkingFrom, readOnly, viewport,
       onContextMenu={onContextMenu}
       onMouseMove={onMouseMove}
     >
-      <svg className="wm-svg" width="100%" height="100%">
+      <svg className="wm-svg" width="100%" height="100%" style={pending ? { visibility: "hidden" } : undefined}>
         <g className="wm-world" transform={`translate(${v.x},${v.y}) scale(${v.k})`}>
           <g>{boundaries}</g>
           {halos.length > 0 && <g className="wm-ui">{halos}</g>}

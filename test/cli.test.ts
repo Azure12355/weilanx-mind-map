@@ -31,8 +31,9 @@ test("cli:移动、删除、联系线、概括、文档属性", () => {
   wm("move", f, b, "--parent", a);
   wm("add", f, "--parent", "R", "C");
   wm("rel", f, "R/A/B", "R/C", "--text", "依赖");
-  wm("doc", f, "--theme", "fresh", "--structure", "logic");
+  wm("doc", f, "--theme", "fresh", "--structure", "logic", "--look", "hand");
   const d = parse(fs.readFileSync(f, "utf8")).doc!;
+  assert.equal(d.look, "hand");
   assert.equal(d.root.children![0].children![0].text, "B");
   assert.equal(d.relationships![0].text, "依赖");
   assert.equal(d.theme, "fresh");

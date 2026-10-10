@@ -8,7 +8,7 @@ import { fromMarkdown, toMarkdown } from "../core/markdown";
 import { outline, resolveRef, RefError, search, topicPath } from "../core/query";
 import { markerDef } from "../core/markers";
 import { THEMES } from "../core/theme";
-import { MindDoc, STRUCTURES, Structure, Style, Topic } from "../core/types";
+import { FILL_STYLES, FillStyle, Look, LOOKS, MindDoc, STRUCTURES, Structure, Style, Topic } from "../core/types";
 
 const HELP = `wm — 读写 .wmind 思维导图(纯 JSON)
 
@@ -29,10 +29,10 @@ const HELP = `wm — 读写 .wmind 思维导图(纯 JSON)
   wm rel      <file> <from-ref> <to-ref> [--text T]     添加联系线
   wm summary  <file> <ref>... [--text T]                给同一父节点下的几个兄弟加概括
   wm boundary <file> <ref>... [--text T]                给同一父节点下的几个兄弟加外框
-  wm doc      <file> [--theme 名称] [--structure map|logic|org|tree]
+  wm doc      <file> [--theme 名称] [--look standard|hand] [--fill hachure|cross-hatch|solid|dots|dashed|zigzag|none] [--structure map|logic|org|tree]
   wm from-md  <md 文件> -o <file> [--title 中心主题]    Markdown 大纲 → 导图
 
-样式键:shape fill border borderWidth textColor fontSize bold italic strike lineColor lineWidth lineStyle
+样式键:shape fill border borderWidth textColor fontSize bold italic strike lineColor lineWidth lineStyle fillStyle textAlign
 主题:${THEMES.map((t) => t.id).join(" ")}
 标记:priority-1..9  task-0/25/50/75/100  flag-<色>  star-<色>  smiley-happy/laugh/sad/angry/surprised
       symbol-question/exclamation/check/cross/idea   (色:red orange yellow green blue purple)`;
@@ -223,6 +223,11 @@ function run(argv: string[]): number {
       if (link !== undefined) doc = ops.updateTopic(doc, t.id, { link: link || undefined });
       const col = one(a, "collapsed");
       if (col !== undefined) doc = ops.setCollapsed(doc, t.id, col === "true");
+      const look = one(a, "look");
+      if (look !== undefined) {
+        if (!LOOKS.includes(look as Look)) throw new UsageError(`未知画法:${look}`);
+        doc = ops.setDocProp(doc, "look", look);
+      }
       const st = one(a, "structure");
       if (st !== undefined) {
         if (st && !STRUCTURES.includes(st as Structure)) throw new UsageError(`未知结构:${st}`);
@@ -297,6 +302,16 @@ function run(argv: string[]): number {
       if (theme !== undefined) {
         if (!THEMES.some((t) => t.id === theme)) throw new UsageError(`未知主题:${theme}`);
         doc = ops.setDocProp(doc, "theme", theme);
+      }
+      const look = one(a, "look");
+      if (look !== undefined) {
+        if (!LOOKS.includes(look as Look)) throw new UsageError(`未知画法:${look}`);
+        doc = ops.setDocProp(doc, "look", look);
+      }
+      const fill = one(a, "fill");
+      if (fill !== undefined) {
+        if (!FILL_STYLES.includes(fill as FillStyle)) throw new UsageError(`未知填充样式:${fill}`);
+        doc = ops.setDocProp(doc, "fillStyle", fill);
       }
       const st = one(a, "structure");
       if (st !== undefined) {

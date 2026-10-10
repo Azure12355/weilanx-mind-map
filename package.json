@@ -299,7 +299,8 @@
   },
   "dependencies": {
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "roughjs": "^4.6.6"
   },
   "homepage": "https://azure12355.github.io/weilanx-mind-map/",
   "bugs": {

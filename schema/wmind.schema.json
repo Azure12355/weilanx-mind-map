@@ -24,6 +24,25 @@
         "mono"
       ]
     },
+    "look": {
+      "description": "画法:standard 标准 / hand Excalidraw 风格手绘 / Rendering look: standard or hand-drawn (Excalidraw style)",
+      "enum": [
+        "standard",
+        "hand"
+      ]
+    },
+    "fillStyle": {
+      "description": "手绘画法下有底色节点的默认填充样式,默认 hachure / Default fill style of filled topics in the hand-drawn look",
+      "enum": [
+        "hachure",
+        "cross-hatch",
+        "solid",
+        "dots",
+        "dashed",
+        "zigzag",
+        "none"
+      ]
+    },
     "structure": {
       "enum": [
         "map",
@@ -315,6 +334,26 @@
             "elbow",
             "dashed",
             "solid"
+          ]
+        },
+        "fillStyle": {
+          "description": "手绘画法下的填充样式 / Fill style in the hand-drawn look",
+          "enum": [
+            "hachure",
+            "cross-hatch",
+            "solid",
+            "dots",
+            "dashed",
+            "zigzag",
+            "none"
+          ]
+        },
+        "textAlign": {
+          "description": "内容对齐,默认居中 / Content alignment, default center",
+          "enum": [
+            "left",
+            "center",
+            "right"
           ]
         }
       }

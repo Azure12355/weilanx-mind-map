@@ -1,12 +1,13 @@
 // 文档 → 可渲染的场景:最终样式、节点尺寸、布局
 import { resolveAll, type Palette, type ResolvedStyle } from "../../src/core/theme";
 import { layout, type LayoutResult, type NodeSize } from "../../src/core/layout";
-import type { MindDoc, Range, Topic } from "../../src/core/types";
+import type { Look, MindDoc, Range, Topic } from "../../src/core/types";
 import { measure, type Metrics } from "./measure";
 import { t } from "./i18n";
 
 export interface Scene {
   palette: Palette;
+  look: Look;
   styles: Map<string, ResolvedStyle>;
   metrics: Map<string, Metrics>;
   layout: LayoutResult;
@@ -16,7 +17,7 @@ export interface Scene {
 }
 
 export function buildScene(doc: MindDoc, dark: boolean): Scene {
-  const { palette, styles } = resolveAll(doc, dark);
+  const { palette, styles, look } = resolveAll(doc, dark);
   const metrics = new Map<string, Metrics>();
   const sizes = new Map<string, NodeSize>();
   const topics = new Map<string, Topic>();
@@ -47,5 +48,5 @@ export function buildScene(doc: MindDoc, dark: boolean): Scene {
   };
   visit(doc.root);
   for (const f of doc.floating ?? []) visit(f);
-  return { palette, styles, metrics, layout: layout(doc, sizes), topics, ranges };
+  return { palette, look, styles, metrics, layout: layout(doc, sizes), topics, ranges };
 }

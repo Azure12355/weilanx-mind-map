@@ -51,6 +51,9 @@ Topics are addressed by **id** or by **path**: topic texts joined with `/`, star
    $WM summary m.wmind "产品规划/MVP/A" "产品规划/MVP/C" --text "两周完成"   # first and last sibling of the range
    $WM boundary m.wmind "产品规划/MVP/A" "产品规划/MVP/B" --text "本迭代"
    $WM doc m.wmind --theme fresh --structure logic
+   $WM doc m.wmind --look hand                 # Excalidraw-style hand-drawn look; --look standard to switch back
+   $WM doc m.wmind --fill none                 # hand-drawn default fill: hachure cross-hatch solid dots dashed zigzag none
+   $WM set m.wmind "产品规划" --style fillStyle=solid --style textAlign=left
    $WM new plan.wmind "读书计划"
    $WM from-md outline.md -o plan.wmind        # Markdown outline → map
    $WM to-md plan.wmind > plan.md              # map → Markdown outline

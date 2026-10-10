@@ -9,6 +9,8 @@ UTF-8 JSON, 2-space indentation, one trailing newline. JSON Schema: `schema/wmin
 | `$schema` | string | optional |
 | `version` | number | required, currently `1`. A newer version opens read-only |
 | `theme` | string | optional, default `classic`. One of `classic` `fresh` `business` `night` `sketch` `mono` |
+| `look` | string | optional, default `standard`. `hand` draws the whole map in Excalidraw's hand-drawn style (rough lines, hachure fill, Excalifont / 小赖 handwriting). Independent of `theme`; `sketch` + `hand` looks like Excalidraw itself |
+| `fillStyle` | string | optional, default `hachure`. How filled topics are filled when `look` is `hand`; same values as the style key `fillStyle`. Topics override it with their own `style.fillStyle` |
 | `structure` | string | optional, default `map`. One of `map` (balanced left/right) `logic` (to the right) `org` (downward org chart) `tree` (indented tree) |
 | `root` | Topic | required, the central topic |
 | `relationships` | Relationship[] | optional |
@@ -64,6 +66,8 @@ A curved arrow between any two topics, floating ones included. `controls` holds 
 | `lineColor` | `#RRGGBB`, color of the lines going to this topic's children. On a main branch it also sets the branch color |
 | `lineWidth` | 1–8 |
 | `lineStyle` | `curve` `straight` `elbow`. Relationships also accept `dashed` `solid` |
+| `fillStyle` | only used when `look` is `hand`: `hachure` `cross-hatch` `solid` `dots` `dashed` `zigzag` `none` (outline only). Overrides the document default |
+| `textAlign` | `left` `center` `right`, default `center`. Aligns the text, markers and labels inside the topic |
 
 Invalid values are ignored when drawing and reported by `wm validate`.
 

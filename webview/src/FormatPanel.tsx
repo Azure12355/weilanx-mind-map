@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import * as ops from "../../src/core/ops";
 import { getTopic, countDescendants } from "../../src/core/query";
-import { getTheme, THEMES, type ResolvedStyle } from "../../src/core/theme";
+import { getTheme, THEMES, tint, type ResolvedStyle } from "../../src/core/theme";
 import { MARKER_CATEGORIES, markerDef } from "../../src/core/markers";
 import { rootStructure } from "../../src/core/layout";
-import { docTheme, cleanStyle } from "../../src/core/doc";
-import type { LineStyle, MindDoc, Shape, Structure, Style } from "../../src/core/types";
+import { docFillStyle, docLook, docTheme, cleanStyle } from "../../src/core/doc";
+import { FILL_STYLES, LOOKS, type FillStyle, type LineStyle, type TextAlign, type Look, type MindDoc, type Shape, type Structure, type Style } from "../../src/core/types";
 import type { Actions } from "./App";
 import type { Scene } from "./scene";
 import { Icon } from "./icons";
 import { langIsZh, t } from "./i18n";
 import { shapePath } from "./TopicNode";
+import { Rough } from "./rough";
 
 const SWATCHES = [
   "#F0604D", "#F5A623", "#F8D74A", "#3DB47A", "#2FB8AC", "#2F9BEA", "#7C63F2", "#E3578F", "#8E8C99", "#1F2D3D",
@@ -101,11 +102,38 @@ export function StructureIcon({ s }: { s: Structure }) {
   );
 }
 
-export function ThemeSwatch({ id, dark }: { id: string; dark: boolean }) {
+export function ThemeSwatch({ id, dark, look = "standard" }: { id: string; dark: boolean; look?: Look }) {
   const th = getTheme(id);
   const p = dark ? th.dark : th.light;
-  const pick = (v: string, i: number) => (v === "branch" ? p.rainbow[i % p.rainbow.length] : v === "none" ? "transparent" : v);
+  const pick = (v: string, i: number) => {
+    const c = p.rainbow[i % p.rainbow.length];
+    return v === "branch" ? c : v === "tint" ? tint(c, p.background) : v === "none" ? "transparent" : v;
+  };
   const root = p.root.fill === "none" ? "transparent" : p.root.fill;
+  if (look === "hand") {
+    const rootFill = p.root.fill === "none" ? undefined : p.root.fill;
+    const rootStroke = p.root.border === "none" ? (rootFill ?? p.text) : p.root.border;
+    return (
+      <svg width="64" height="40" viewBox="0 0 64 40">
+        <rect width="64" height="40" rx="5" fill={p.background} />
+        {[0, 1, 2].map((i) => (
+          <Rough key={i} id={`sw-${id}-l${i}`} geo={{ t: "path", d: `M40 20 C44 20 42 ${8 + i * 12} 47 ${8 + i * 12}`, size: 20 }} style={{ stroke: p.rainbow[i % p.rainbow.length], strokeWidth: 1.2 }} />
+        ))}
+        {[0, 1, 2].map((i) => {
+          const fill = pick(p.main.fill, i);
+          const stroke = p.main.border === "none" ? fill : pick(p.main.border, i);
+          return (
+            <g key={i} transform={`translate(48,${4 + i * 12})`}>
+              <Rough id={`sw-${id}-m${i}`} geo={{ t: "shape", shape: "rect", w: 12, h: 8 }} style={{ stroke, strokeWidth: 1, fill: fill === "transparent" ? undefined : fill }} />
+            </g>
+          );
+        })}
+        <g transform="translate(16,14)">
+          <Rough id={`sw-${id}-root`} geo={{ t: "shape", shape: "rounded", w: 24, h: 12 }} style={{ stroke: rootStroke, strokeWidth: 1.2, fill: rootFill }} />
+        </g>
+      </svg>
+    );
+  }
   return (
     <svg width="64" height="40" viewBox="0 0 64 40">
       <rect width="64" height="40" rx="5" fill={p.background} />
@@ -138,6 +166,40 @@ function ShapeIcon({ shape }: { shape: Shape }) {
   return (
     <svg width="30" height="18" viewBox="-1 -1 30 18">
       <path d={shapePath(shape, 28, 16)} fill="none" stroke="currentColor" strokeWidth="1.5" />
+    </svg>
+  );
+}
+
+/** 填充样式的小预览:用 rough.js 实际画一块 */
+function FillIcon({ fs }: { fs: FillStyle }) {
+  return (
+    <svg width="30" height="18" viewBox="-2 -2 30 18">
+      <Rough id={"fill-icon"} geo={{ t: "shape", shape: "rect", w: 26, h: 14 }} style={{ stroke: "currentColor", strokeWidth: 1, fill: fs === "none" ? undefined : "currentColor", fillStyle: fs === "none" ? undefined : fs }} />
+    </svg>
+  );
+}
+
+/** 填充样式选择:value 是当前生效的值,own 是节点 / 文档自己设置的值;再点一次自己设置的值即清除 */
+function FillStylePicker({ value, own, onChange }: { value: FillStyle; own: FillStyle | undefined; onChange: (v: FillStyle | undefined) => void }) {
+  return (
+    <div className="wm-shapes wm-fills">
+      {FILL_STYLES.map((fs) => (
+        <button key={fs} className={"wm-shape" + (value === fs ? " wm-active" : "") + (own === fs ? " wm-own" : "")} title={t(`fillStyle.${fs}`)} onClick={() => onChange(own === fs ? undefined : fs)}>
+          <FillIcon fs={fs} />
+          <span>{t(`fillStyle.${fs}`)}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function AlignIcon({ a }: { a: TextAlign }) {
+  const rows = a === "left" ? [[2, 14], [2, 10], [2, 12]] : a === "right" ? [[2, 14], [6, 10], [4, 12]] : [[2, 14], [4, 10], [3, 12]];
+  return (
+    <svg width="16" height="14" viewBox="0 0 16 14">
+      {rows.map(([x, w], i) => (
+        <path key={i} d={`M${x} ${3 + i * 4}H${x + w - 2}`} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      ))}
     </svg>
   );
 }
@@ -256,6 +318,11 @@ function TopicStyle({ a, scene, ids, focus }: { a: Actions; scene: Scene; ids: s
       <Section title={t("fill")}>
         <Colors value={own.fill as string | undefined} onChange={(v) => set({ fill: v })} allowNone />
       </Section>
+      {rs?.hand && (
+        <Section title={t("fillStyle")}>
+          <FillStylePicker value={rs.fillStyle} own={own.fillStyle as FillStyle | undefined} onChange={(v) => set({ fillStyle: v })} />
+        </Section>
+      )}
       <Section title={t("border")}>
         <Colors value={own.border as string | undefined} onChange={(v) => set({ border: v, borderWidth: v && v !== "none" && !rs?.borderWidth ? 1.5 : own.borderWidth })} allowNone />
         <div className="wm-row">
@@ -293,6 +360,14 @@ function TopicStyle({ a, scene, ids, focus }: { a: Actions; scene: Scene; ids: s
               <s>S</s>
             </button>
           </div>
+        </div>
+        <div className="wm-row">
+          <span className="wm-row-label">{t("align")}</span>
+          <Seg<TextAlign>
+            value={rs?.textAlign ?? "center"}
+            options={(["left", "center", "right"] as TextAlign[]).map((al) => ({ v: al, label: <AlignIcon a={al} />, title: t(`align.${al}`) }))}
+            onChange={(al) => set({ textAlign: al === "center" ? undefined : al })}
+          />
         </div>
         <Colors value={own.textColor as string | undefined} onChange={(v) => set({ textColor: v })} />
       </Section>
@@ -494,18 +569,42 @@ function RelStyle({ a, id }: { a: Actions; id: string }) {
   );
 }
 
+/** 画法切换:标准 / 手绘 */
+export function LookSwitch({ a }: { a: Actions }) {
+  const look = docLook(a.doc);
+  return (
+    <div className="wm-seg wm-seg-full wm-look">
+      {LOOKS.map((l) => (
+        <button key={l} className={l === look ? "wm-active" : ""} disabled={a.readOnly} onClick={() => l !== look && a.apply((d) => ops.setDocProp(d, "look", l === "standard" ? undefined : l))}>
+          {t(`look.${l}`)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function CanvasTab({ a }: { a: Actions }) {
   const doc = a.doc;
   const theme = docTheme(doc);
+  const look = docLook(doc);
   const st = rootStructure(doc);
   const total = countDescendants(doc.root) + 1 + (doc.floating ?? []).reduce((n, f) => n + 1 + countDescendants(f), 0);
   return (
     <fieldset disabled={a.readOnly} className="wm-fieldset">
+      <Section title={t("look")}>
+        <LookSwitch a={a} />
+      </Section>
+      {look === "hand" && (
+        <Section title={t("fillStyleDefault")}>
+          <FillStylePicker value={docFillStyle(doc)} own={doc.fillStyle} onChange={(v) => a.apply((d) => ops.setDocProp(d, "fillStyle", v === "hachure" ? undefined : v))} />
+          <p className="wm-hint">{t("fillStyleHint")}</p>
+        </Section>
+      )}
       <Section title={t("theme")}>
         <div className="wm-theme-grid wm-theme-grid-panel">
           {THEMES.map((th) => (
             <button key={th.id} className={"wm-card" + (th.id === theme ? " wm-active" : "")} onClick={() => a.apply((d) => ops.setDocProp(d, "theme", th.id))}>
-              <ThemeSwatch id={th.id} dark={a.dark} />
+              <ThemeSwatch id={th.id} dark={a.dark} look={look} />
               <span>{langIsZh() ? th.zh : th.en}</span>
             </button>
           ))}

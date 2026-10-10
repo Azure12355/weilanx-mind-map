@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { THEMES } from "../../src/core/theme";
 import { rootStructure } from "../../src/core/layout";
-import { docTheme } from "../../src/core/doc";
+import { docLook, docTheme } from "../../src/core/doc";
 import { setDocProp } from "../../src/core/ops";
 import { getTopic } from "../../src/core/query";
 import type { Structure } from "../../src/core/types";
 import type { Actions, ViewPrefs } from "./App";
 import { Icon } from "./icons";
 import { langIsZh, t } from "./i18n";
-import { StructureIcon, ThemeSwatch } from "./FormatPanel";
+import { LookSwitch, StructureIcon, ThemeSwatch } from "./FormatPanel";
 
 function Btn({ icon, label, onClick, disabled, active, title }: { icon: ReactNode; label?: string; onClick: () => void; disabled?: boolean; active?: boolean; title?: string }) {
   return (
@@ -128,6 +128,10 @@ export function Toolbar({ actions: a, view, setView, panel, togglePanel, laser, 
               <div className="wm-settings-title">{t("display")}</div>
               <Switch label={t("showBranches")} on={prefs.showBranches} onChange={(on) => setPrefs({ showBranches: on })} />
               <Switch label={t("showRelationships")} on={prefs.showRelationships} onChange={(on) => setPrefs({ showRelationships: on })} />
+              <div className="wm-settings-title">{t("look")}</div>
+              <div className="wm-settings-look">
+                <LookSwitch a={a} />
+              </div>
               <div className="wm-settings-title">{t("theme")}</div>
               <div className="wm-theme-grid">
                 {THEMES.map((th) => (
@@ -140,7 +144,7 @@ export function Toolbar({ actions: a, view, setView, panel, togglePanel, laser, 
                       close();
                     }}
                   >
-                    <ThemeSwatch id={th.id} dark={a.dark} />
+                    <ThemeSwatch id={th.id} dark={a.dark} look={docLook(a.doc)} />
                     <span>{langIsZh() ? th.zh : th.en}</span>
                   </button>
                 ))}

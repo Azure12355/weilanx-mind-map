@@ -52,7 +52,9 @@ Each map is a single `.wmind` file containing **plain JSON**, structured as a ne
 1. **Feels like XMind**:
 
 - 🌈 Rainbow branches with tapered main curves; subtopics fan out on smooth curves into their underlines
-- 🎨 6 built-in themes (Classic, Fresh, Business, Night, Sketch, Mono), each with light and dark variants that follow your editor
+- 🎨 6 built-in themes (Classic, Fresh, Business, Night, Excalidraw, Mono), each with light and dark variants that follow your editor
+- ✏️ Standard / Hand-drawn look switch: any theme can be drawn in Excalidraw's hand-drawn style (rough lines, Excalifont and Xiaolai handwriting), exports included. Fill style (hachure, cross-hatch, solid, dots, dashed, zigzag or none) can be set for the whole map or per topic
+- ↔️ Per-topic content alignment: left, center (default) or right
 - 🧭 4 structures (mind map, logic chart, org chart, tree chart), for the whole map or a single branch
 
 2. **Editing**:
@@ -194,7 +196,7 @@ On Windows / Linux, use `Ctrl` instead of `Cmd`.
 - **Only non-default values are written**: no `style` means "follow the theme", and `collapsed` appears only when `true`.
 - **New topics may omit `id`**: the plugin fills it in.
 - **Summaries and boundaries name their first and last child by id**, so ranges stay correct when siblings are inserted.
-- **Themes**: `classic` · `fresh` · `business` · `night` · `sketch` · `mono`. **Structures**: `map` · `logic` · `org` · `tree`.
+- **Themes**: `classic` · `fresh` · `business` · `night` · `sketch` (Excalidraw) · `mono`. **Looks**: `standard` · `hand`. **Structures**: `map` · `logic` · `org` · `tree`.
 
 Every field is described in [references/format.md](./skills/weilanx-mind-map/references/format.md), and the schema is [schema/wmind.schema.json](./schema/wmind.schema.json). In VS Code, **Open as JSON Text** (editor title bar) gives you schema completion and validation.
 
